@@ -3,26 +3,34 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import type { User } from '@supabase/supabase-js'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [user, setUser] = useState(null)
+
+  // ⭐ FIX: user can be User OR null
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadUser() {
       const { data } = await supabase.auth.getUser()
+
       if (!data.user) {
         router.push('/login')
       } else {
         setUser(data.user)
       }
+
       setLoading(false)
     }
+
     loadUser()
   }, [router])
 
-  if (loading) return <p style={{ fontFamily: 'sans-serif', padding: 20 }}>Loading...</p>
+  if (loading) {
+    return <p style={{ fontFamily: 'sans-serif', padding: 20 }}>Loading...</p>
+  }
 
   return (
     <div style={{ maxWidth: 600, margin: '50px auto', fontFamily: 'sans-serif' }}>
