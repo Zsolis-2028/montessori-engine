@@ -10,24 +10,30 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  async function handleLogin(e) {
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
+
     if (error) {
       setError(error.message)
-    } else {
-      router.push('/dashboard')
+      return
     }
+
+    router.push('/dashboard')
   }
 
   return (
     <div style={{ maxWidth: 400, margin: '50px auto', fontFamily: 'sans-serif' }}>
       <h1 style={{ marginBottom: 20 }}>Login</h1>
 
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <form
+        onSubmit={handleLogin}
+        style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+      >
         <label>Email</label>
         <input
           type="email"
@@ -62,7 +68,12 @@ export default function LoginPage() {
         </button>
       </form>
 
-      {error && <p style={{ color: 'red', marginTop: 10 }}>{error}</p>}
+      {error && (
+        <p style={{ color: 'red', marginTop: 10 }}>
+          {error}
+        </p>
+      )}
     </div>
   )
 }
+
