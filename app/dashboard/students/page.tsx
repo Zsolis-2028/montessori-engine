@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<any[]>([])
+  const [classrooms, setClassrooms] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   // form state
@@ -23,14 +24,21 @@ export default function StudentsPage() {
         .select('*')
         .order('created_at', { ascending: false })
 
-      if (!error) {
-        setStudents(data || [])
-      }
-
+      if (!error) setStudents(data || [])
       setLoading(false)
     }
 
+    async function loadClassrooms() {
+      const { data, error } = await supabase
+        .from('classrooms')
+        .select('*')
+        .order('name', { ascending: true })
+
+      if (!error) setClassrooms(data || [])
+    }
+
     loadStudents()
+    loadClassrooms()
   }, [])
 
   function startEdit(student: any) {
@@ -80,9 +88,7 @@ export default function StudentsPage() {
       .delete()
       .eq('id', id)
 
-    if (!error) {
-      reloadStudents()
-    }
+    if (!error) reloadStudents()
   }
 
   async function reloadStudents() {
@@ -154,13 +160,19 @@ export default function StudentsPage() {
             style={{ padding: 10, border: '1px solid #ccc', borderRadius: 4 }}
           />
 
-          <input
-            type="text"
-            placeholder="Classroom"
+          {/* CLASSROOM DROPDOWN */}
+          <select
             value={classroom}
             onChange={(e) => setClassroom(e.target.value)}
             style={{ padding: 10, border: '1px solid #ccc', borderRadius: 4 }}
-          />
+          >
+            <option value="">Select a classroom</option>
+            {classrooms.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
 
           <button
             type="submit"
