@@ -56,6 +56,22 @@ export default function StudentsPage() {
     }
   }
 
+  async function handleDeleteStudent(id: number) {
+    const { error } = await supabase
+      .from('students')
+      .delete()
+      .eq('id', id)
+
+    if (!error) {
+      const { data } = await supabase
+        .from('students')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      setStudents(data || [])
+    }
+  }
+
   if (loading) {
     return <p style={{ padding: 20 }}>Loading students...</p>
   }
@@ -148,6 +164,21 @@ export default function StudentsPage() {
             <strong>{s.name}</strong><br />
             Age: {s.age}<br />
             Classroom: {s.classroom}
+
+            <button
+              onClick={() => handleDeleteStudent(s.id)}
+              style={{
+                marginTop: 10,
+                padding: '6px 10px',
+                background: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: 4,
+                cursor: 'pointer'
+              }}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
