@@ -36,6 +36,21 @@ export default function DashboardPage() {
     <div style={{ maxWidth: 600, margin: '50px auto', fontFamily: 'sans-serif' }}>
       <h1>Dashboard</h1>
       <p>Welcome, {user?.email}</p>
+<button
+  onClick={() => router.push('/dashboard/students')}
+  style={{
+    padding: 10,
+    background: '#0070f3',
+    color: 'white',
+    border: 'none',
+    borderRadius: 4,
+    cursor: 'pointer',
+    marginTop: 20,
+    display: 'block'
+  }}
+>
+  View Students
+</button>
 
       <button
         onClick={async () => {
