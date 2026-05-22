@@ -13,6 +13,9 @@ export default function StudentsPage() {
   const [age, setAge] = useState('')
   const [classroom, setClassroom] = useState('')
 
+  // edit state
+  const [editingId, setEditingId] = useState<number | null>(null)
+
   useEffect(() => {
     async function loadStudents() {
       const { data, error } = await supabase
@@ -30,6 +33,14 @@ export default function StudentsPage() {
     loadStudents()
   }, [])
 
+  function startEdit(student: any) {
+    setEditingId(student.id)
+    setName(student.name)
+    setAge(String(student.age))
+    setClassroom(student.classroom)
+    setShowForm(true)
+  }
+
   async function handleAddStudent(e: any) {
     e.preventDefault()
 
@@ -40,19 +51,26 @@ export default function StudentsPage() {
     })
 
     if (!error) {
-      // reset form
-      setShowForm(false)
-      setName('')
-      setAge('')
-      setClassroom('')
+      resetForm()
+      reloadStudents()
+    }
+  }
 
-      // reload students
-      const { data } = await supabase
-        .from('students')
-        .select('*')
-        .order('created_at', { ascending: false })
+  async function handleUpdateStudent(e: any) {
+    e.preventDefault()
 
-      setStudents(data || [])
+    const { error } = await supabase
+      .from('students')
+      .update({
+        name,
+        age: Number(age),
+        classroom
+      })
+      .eq('id', editingId)
+
+    if (!error) {
+      resetForm()
+      reloadStudents()
     }
   }
 
@@ -63,13 +81,25 @@ export default function StudentsPage() {
       .eq('id', id)
 
     if (!error) {
-      const { data } = await supabase
-        .from('students')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      setStudents(data || [])
+      reloadStudents()
     }
+  }
+
+  async function reloadStudents() {
+    const { data } = await supabase
+      .from('students')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    setStudents(data || [])
+  }
+
+  function resetForm() {
+    setShowForm(false)
+    setEditingId(null)
+    setName('')
+    setAge('')
+    setClassroom('')
   }
 
   if (loading) {
@@ -97,7 +127,7 @@ export default function StudentsPage() {
 
       {showForm && (
         <form
-          onSubmit={handleAddStudent}
+          onSubmit={editingId ? handleUpdateStudent : handleAddStudent}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -136,14 +166,14 @@ export default function StudentsPage() {
             type="submit"
             style={{
               padding: 10,
-              background: '#28a745',
+              background: editingId ? '#ffc107' : '#28a745',
               color: 'white',
               border: 'none',
               borderRadius: 4,
               cursor: 'pointer'
             }}
           >
-            Save Student
+            {editingId ? 'Update Student' : 'Save Student'}
           </button>
         </form>
       )}
@@ -165,20 +195,36 @@ export default function StudentsPage() {
             Age: {s.age}<br />
             Classroom: {s.classroom}
 
-            <button
-              onClick={() => handleDeleteStudent(s.id)}
-              style={{
-                marginTop: 10,
-                padding: '6px 10px',
-                background: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: 4,
-                cursor: 'pointer'
-              }}
-            >
-              Delete
-            </button>
+            <div style={{ marginTop: 10 }}>
+              <button
+                onClick={() => startEdit(s)}
+                style={{
+                  padding: '6px 10px',
+                  background: '#ffc107',
+                  color: 'black',
+                  border: 'none',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  marginRight: 10
+                }}
+              >
+                Edit
+              </button>
+
+              <button
+                onClick={() => handleDeleteStudent(s.id)}
+                style={{
+                  padding: '6px 10px',
+                  background: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 4,
+                  cursor: 'pointer'
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
