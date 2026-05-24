@@ -21,3 +21,16 @@ Built with a modern stack focused on speed, clarity, and real‑world usability.
 Install dependencies:
 ```bash
 npm install
+## 📁 Project Structure
+app/
+  dashboard/
+    students/
+    classrooms/
+    teachers/
+lib/
+  supabase.ts
+## 🌐 Deployment
+This project auto‑deploys to Vercel on every push to the master branch.
+
+Live site:
+https://montessori-engine.vercel.app
