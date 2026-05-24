@@ -1,5 +1,4 @@
 # Montessori Engine
-
 A custom-built Montessori school management system designed to help organize:
 - Students
 - Classrooms
@@ -11,7 +10,6 @@ Built with a modern stack focused on speed, clarity, and real‑world usability.
 ---
 
 ## 🚀 Tech Stack
-
 - **Next.js 16** (App Router)
 - **Supabase** (Database + Auth)
 - **Tailwind CSS**
@@ -20,8 +18,6 @@ Built with a modern stack focused on speed, clarity, and real‑world usability.
 ---
 
 ## 🧪 Local Development
-
 Install dependencies:
-
 ```bash
 npm install
