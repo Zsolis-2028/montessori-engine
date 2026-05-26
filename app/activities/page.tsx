@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@supabase/ssr";
 
 export default function ActivityGenerator() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const [ageRange, setAgeRange] = useState("");
   const [domain, setDomain] = useState("");
