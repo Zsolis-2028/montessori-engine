@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@supabase/ssr";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function ActivityGenerator() {
-  const supabase = createClient();
+  const supabase = createBrowserClient();
 
   const [ageRange, setAgeRange] = useState("");
   const [domain, setDomain] = useState("");
