@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function ActivityGenerator() {
-  const supabase = createClient(
+  const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
@@ -37,6 +37,7 @@ export default function ActivityGenerator() {
     );
 
     if (error) {
+      console.error(error);
       setOutput("Error generating activity.");
     } else {
       setOutput(data.activity);
@@ -45,27 +46,26 @@ export default function ActivityGenerator() {
     setLoading(false);
   };
 
-const saveActivity = async () => {
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const saveActivity = async () => {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    alert("You must be logged in to save activities.");
-    return;
-  }
+    if (!user) {
+      alert("You must be logged in to save activities.");
+      return;
+    }
 
-  await supabase.from("activities").insert({
-    user_id: user.id,
-    domain,
-    material,
-    age_range: ageRange,
-    generated_activity: output
-  });
+    await supabase.from("activities").insert({
+      user_id: user.id,
+      domain,
+      material,
+      age_range: ageRange,
+      generated_activity: output
+    });
 
-  alert("Activity saved!");
-};
-
+    alert("Activity saved!");
+  };
 
   return (
     <div style={{ padding: 24 }}>
