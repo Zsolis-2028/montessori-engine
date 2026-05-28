@@ -13,6 +13,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <a href="/dashboard/students" className="block text-blue-600">Students</a>
           <a href="/dashboard/classrooms" className="block text-blue-600">Classrooms</a>
           <a href="/dashboard/teachers" className="block text-blue-600">Teachers</a>
+          <a href="/activities" className="block text-blue-600">Activities</a>
         </nav>
       </aside>
 
