@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 
 export default function ActivityGenerator() {
-  const supabase = createBrowserClient(
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
@@ -34,9 +34,10 @@ export default function ActivityGenerator() {
       - Language to use with the child
     `;
 
-    const { data, error } = await supabase.functions.invoke("activity-generator", {
-      body: { prompt }
-    });
+    const { data, error } = await supabase.functions.invoke(
+      "activity-generator",
+      { body: { prompt } }
+    );
 
     if (error) {
       setOutput("Error generating activity.");
