@@ -17,27 +17,33 @@ export default function ActivityGenerator() {
 
   const generateActivity = async () => {
     setLoading(true);
+    setOutput("");
 
+    // ⭐ CLEAN, SAFE PROMPT — NO INDENTATION ISSUES
     const prompt = `
-      Create a Montessori activity for:
-      - Age Range: ${ageRange}
-      - Domain: ${domain}
-      - Material: ${material}
+Create a Montessori activity for:
+Age Range: ${ageRange}
+Domain: ${domain}
+Material: ${material}
 
-      Include:
-      - Purpose of the activity
-      - Step-by-step presentation
-      - Control of error
-      - Language to use with the child
-    `;
+Include:
+- Purpose
+- Step-by-step presentation
+- Control of error
+- Points of interest
+- Extensions
+- Language to use with the child
+`;
 
     const { data, error } = await supabase.functions.invoke(
       "activity-generator",
-      { body: { prompt } }
+      {
+        body: { prompt }
+      }
     );
 
     if (error) {
-      console.error(error);
+      console.error("Function error:", error);
       setOutput("Error generating activity.");
     } else {
       setOutput(data.activity);
@@ -68,7 +74,7 @@ export default function ActivityGenerator() {
   };
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: 24, maxWidth: 600, margin: "0 auto" }}>
       <h1>Activity Generator</h1>
 
       <label>Age Range</label>
@@ -103,7 +109,16 @@ export default function ActivityGenerator() {
       {output && (
         <>
           <h2>Generated Activity</h2>
-          <pre>{output}</pre>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              background: "#f4f4f4",
+              padding: 12,
+              borderRadius: 8
+            }}
+          >
+            {output}
+          </pre>
 
           <button onClick={saveActivity}>Save Activity</button>
         </>
@@ -111,3 +126,4 @@ export default function ActivityGenerator() {
     </div>
   );
 }
+
