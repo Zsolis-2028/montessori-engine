@@ -17,20 +17,17 @@ export default function ActivityGenerator() {
 
   const generateActivity = async () => {
     setLoading(true);
-    setOutput("");
 
     const prompt = `
       Create a Montessori activity for:
-      Age Range: ${ageRange}
-      Domain: ${domain}
-      Material: ${material}
+      - Age Range: ${ageRange}
+      - Domain: ${domain}
+      - Material: ${material}
 
       Include:
-      - Purpose
-      - Presentation steps
+      - Purpose of the activity
+      - Step-by-step presentation
       - Control of error
-      - Points of interest
-      - Extensions
       - Language to use with the child
     `;
 
