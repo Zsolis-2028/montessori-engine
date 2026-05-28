@@ -45,21 +45,27 @@ export default function ActivityGenerator() {
     setLoading(false);
   };
 
-  const saveActivity = async () => {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
+const saveActivity = async () => {
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
 
-    await supabase.from("activities").insert({
-      user_id: user.id,
-      domain,
-      material,
-      age_range: ageRange,
-      generated_activity: output
-    });
+  if (!user) {
+    alert("You must be logged in to save activities.");
+    return;
+  }
 
-    alert("Activity saved!");
-  };
+  await supabase.from("activities").insert({
+    user_id: user.id,
+    domain,
+    material,
+    age_range: ageRange,
+    generated_activity: output
+  });
+
+  alert("Activity saved!");
+};
+
 
   return (
     <div style={{ padding: 24 }}>
