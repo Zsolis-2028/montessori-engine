@@ -1,20 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 
 export default function ClassroomsPage() {
   const [classrooms, setClassrooms] = useState<any[]>([]);
   const [name, setName] = useState("");
 
   async function loadClassrooms() {
-    const { data } = await supabase.from("classrooms").select("*").order("name");
+    const { data } = await supabase
+      .from("classrooms")
+      .select("*")
+      .order("name");
+
     setClassrooms(data || []);
   }
 
   async function addClassroom() {
     if (!name) return;
+
     await supabase.from("classrooms").insert({ name });
+
     setName("");
     loadClassrooms();
   }

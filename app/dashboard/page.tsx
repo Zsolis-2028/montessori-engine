@@ -1,14 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 
 export default function DashboardPage() {
   const router = useRouter()
 
-  // ⭐ FIX: user can be User OR null
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -29,28 +28,72 @@ export default function DashboardPage() {
   }, [router])
 
   if (loading) {
-    return <p style={{ fontFamily: 'sans-serif', padding: 20 }}>Loading...</p>
+    return (
+      <p style={{ fontFamily: 'sans-serif', padding: 20 }}>
+        Loading...
+      </p>
+    )
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: '50px auto', fontFamily: 'sans-serif' }}>
+    <div
+      style={{
+        maxWidth: 600,
+        margin: '50px auto',
+        fontFamily: 'sans-serif',
+      }}
+    >
       <h1>Dashboard</h1>
+
       <p>Welcome, {user?.email}</p>
-<button
-  onClick={() => router.push('/dashboard/students')}
-  style={{
-    padding: 10,
-    background: '#0070f3',
-    color: 'white',
-    border: 'none',
-    borderRadius: 4,
-    cursor: 'pointer',
-    marginTop: 20,
-    display: 'block'
-  }}
->
-  View Students
-</button>
+
+      <button
+        onClick={() => router.push('/dashboard/students')}
+        style={{
+          padding: 10,
+          background: '#0070f3',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          cursor: 'pointer',
+          marginTop: 20,
+          display: 'block',
+        }}
+      >
+        View Students
+      </button>
+
+      <button
+        onClick={() => router.push('/dashboard/teachers')}
+        style={{
+          padding: 10,
+          background: '#16a34a',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          cursor: 'pointer',
+          marginTop: 10,
+          display: 'block',
+        }}
+      >
+        View Teachers
+      </button>
+
+      <button
+        onClick={() => router.push('/dashboard/classrooms')}
+        style={{
+          padding: 10,
+          background: '#9333ea',
+          color: 'white',
+          border: 'none',
+          borderRadius: 4,
+          cursor: 'pointer',
+          marginTop: 10,
+          display: 'block',
+        }}
+      >
+        View Classrooms
+      </button>
 
       <button
         onClick={async () => {
@@ -59,7 +102,7 @@ export default function DashboardPage() {
         }}
         style={{
           padding: 10,
-          background: '#e00',
+          background: '#dc2626',
           color: 'white',
           border: 'none',
           borderRadius: 4,

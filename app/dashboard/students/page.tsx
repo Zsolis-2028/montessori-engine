@@ -1,95 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<any[]>([])
   const [classrooms, setClassrooms] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  // form state
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
   const [age, setAge] = useState('')
   const [classroom, setClassroom] = useState('')
-
-  // edit state
   const [editingId, setEditingId] = useState<number | null>(null)
-
-  useEffect(() => {
-    async function loadStudents() {
-      const { data, error } = await supabase
-        .from('students')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (!error) setStudents(data || [])
-      setLoading(false)
-    }
-
-    async function loadClassrooms() {
-      const { data, error } = await supabase
-        .from('classrooms')
-        .select('*')
-        .order('name', { ascending: true })
-
-      if (!error) setClassrooms(data || [])
-    }
-
-    loadStudents()
-    loadClassrooms()
-  }, [])
-
-  function startEdit(student: any) {
-    setEditingId(student.id)
-    setName(student.name)
-    setAge(String(student.age))
-    setClassroom(student.classroom)
-    setShowForm(true)
-  }
-
-  async function handleAddStudent(e: any) {
-    e.preventDefault()
-
-    const { error } = await supabase.from('students').insert({
-      name,
-      age: Number(age),
-      classroom
-    })
-
-    if (!error) {
-      resetForm()
-      reloadStudents()
-    }
-  }
-
-  async function handleUpdateStudent(e: any) {
-    e.preventDefault()
-
-    const { error } = await supabase
-      .from('students')
-      .update({
-        name,
-        age: Number(age),
-        classroom
-      })
-      .eq('id', editingId)
-
-    if (!error) {
-      resetForm()
-      reloadStudents()
-    }
-  }
-
-  async function handleDeleteStudent(id: number) {
-    const { error } = await supabase
-      .from('students')
-      .delete()
-      .eq('id', id)
-
-    if (!error) reloadStudents()
-  }
 
   async function reloadStudents() {
     const { data } = await supabase
@@ -100,6 +23,53 @@ export default function StudentsPage() {
     setStudents(data || [])
   }
 
+  useEffect(() => {
+    async function loadData() {
+      await reloadStudents()
+
+      const { data } = await supabase
+        .from('classrooms')
+        .select('*')
+        .order('name', { ascending: true })
+
+      setClassrooms(data || [])
+      setLoading(false)
+    }
+
+    loadData()
+  }, [])
+
+  function startEdit(student: any) {
+    setEditingId(student.id)
+    setName(student.name)
+    setAge(String(student.age))
+    setClassroom(student.classroom)
+    setShowForm(true)
+  }
+
+  async function handleSaveStudent(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    if (editingId) {
+      await supabase
+        .from('students')
+        .update({ name, age: Number(age), classroom })
+        .eq('id', editingId)
+    } else {
+      await supabase
+        .from('students')
+        .insert({ name, age: Number(age), classroom })
+    }
+
+    resetForm()
+    reloadStudents()
+  }
+
+  async function handleDeleteStudent(id: number) {
+    await supabase.from('students').delete().eq('id', id)
+    reloadStudents()
+  }
+
   function resetForm() {
     setShowForm(false)
     setEditingId(null)
@@ -108,138 +78,39 @@ export default function StudentsPage() {
     setClassroom('')
   }
 
-  if (loading) {
-    return <p style={{ padding: 20 }}>Loading students...</p>
-  }
+  if (loading) return <p style={{ padding: 20 }}>Loading students...</p>
 
   return (
     <div style={{ maxWidth: 600, margin: '40px auto', fontFamily: 'sans-serif' }}>
       <h1 style={{ marginBottom: 20 }}>Students</h1>
 
-      <button
-        onClick={() => setShowForm(true)}
-        style={{
-          padding: 10,
-          background: '#0070f3',
-          color: 'white',
-          border: 'none',
-          borderRadius: 4,
-          cursor: 'pointer',
-          marginBottom: 20
-        }}
-      >
-        Add Student
-      </button>
+      <button onClick={() => setShowForm(true)}>Add Student</button>
 
       {showForm && (
-        <form
-          onSubmit={editingId ? handleUpdateStudent : handleAddStudent}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-            marginBottom: 20,
-            padding: 20,
-            border: '1px solid #ddd',
-            borderRadius: 6
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Student name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ padding: 10, border: '1px solid #ccc', borderRadius: 4 }}
-          />
+        <form onSubmit={handleSaveStudent}>
+          <input placeholder="Student name" value={name} onChange={(e) => setName(e.target.value)} />
+          <input placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} />
 
-          <input
-            type="number"
-            placeholder="Age"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            style={{ padding: 10, border: '1px solid #ccc', borderRadius: 4 }}
-          />
-
-          {/* CLASSROOM DROPDOWN */}
-          <select
-            value={classroom}
-            onChange={(e) => setClassroom(e.target.value)}
-            style={{ padding: 10, border: '1px solid #ccc', borderRadius: 4 }}
-          >
+          <select value={classroom} onChange={(e) => setClassroom(e.target.value)}>
             <option value="">Select a classroom</option>
             {classrooms.map((c) => (
-              <option key={c.id} value={c.name}>
-                {c.name}
-              </option>
+              <option key={c.id} value={c.name}>{c.name}</option>
             ))}
           </select>
 
-          <button
-            type="submit"
-            style={{
-              padding: 10,
-              background: editingId ? '#ffc107' : '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer'
-            }}
-          >
-            {editingId ? 'Update Student' : 'Save Student'}
-          </button>
+          <button type="submit">{editingId ? 'Update Student' : 'Save Student'}</button>
         </form>
       )}
 
-      {students.length === 0 && <p>No students yet.</p>}
-
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {students.map((s) => (
-          <li
-            key={s.id}
-            style={{
-              padding: 12,
-              border: '1px solid #ddd',
-              borderRadius: 6,
-              marginBottom: 10,
-            }}
-          >
-            <strong>{s.name}</strong><br />
-            Age: {s.age}<br />
-            Classroom: {s.classroom}
-
-            <div style={{ marginTop: 10 }}>
-              <button
-                onClick={() => startEdit(s)}
-                style={{
-                  padding: '6px 10px',
-                  background: '#ffc107',
-                  color: 'black',
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer',
-                  marginRight: 10
-                }}
-              >
-                Edit
-              </button>
-
-              <button
-                onClick={() => handleDeleteStudent(s.id)}
-                style={{
-                  padding: '6px 10px',
-                  background: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 4,
-                  cursor: 'pointer'
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {students.map((s) => (
+        <div key={s.id}>
+          <strong>{s.name}</strong>
+          <p>Age: {s.age}</p>
+          <p>Classroom: {s.classroom}</p>
+          <button onClick={() => startEdit(s)}>Edit</button>
+          <button onClick={() => handleDeleteStudent(s.id)}>Delete</button>
+        </div>
+      ))}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 
 export default function TeachersPage() {
   const [teachers, setTeachers] = useState<any[]>([]);
@@ -12,7 +12,6 @@ export default function TeachersPage() {
   const [name, setName] = useState("");
   const [classroomId, setClassroomId] = useState("");
 
-  // Load teachers
   async function loadTeachers() {
     const { data, error } = await supabase
       .from("teachers")
@@ -22,7 +21,6 @@ export default function TeachersPage() {
     if (!error) setTeachers(data || []);
   }
 
-  // Load classrooms for dropdown
   async function loadClassrooms() {
     const { data, error } = await supabase
       .from("classrooms")
@@ -38,14 +36,12 @@ export default function TeachersPage() {
     );
   }, []);
 
-  // Start editing
   function startEdit(teacher: any) {
     setEditing(teacher);
     setName(teacher.name);
     setClassroomId(teacher.classroom_id);
   }
 
-  // Save teacher (insert or update)
   async function saveTeacher() {
     if (!name || !classroomId) return;
 
@@ -70,7 +66,6 @@ export default function TeachersPage() {
     loadTeachers();
   }
 
-  // Delete teacher
   async function deleteTeacher(id: number) {
     await supabase.from("teachers").delete().eq("id", id);
     loadTeachers();
@@ -82,7 +77,6 @@ export default function TeachersPage() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Teachers</h1>
 
-      {/* Form */}
       <div className="mb-6 space-y-3">
         <input
           className="border p-2 w-full"
@@ -125,7 +119,6 @@ export default function TeachersPage() {
         )}
       </div>
 
-      {/* List */}
       <div className="space-y-3">
         {teachers.map((t) => (
           <div
