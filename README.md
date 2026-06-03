@@ -71,3 +71,30 @@ This project is being built with security in mind, including:
 ## Project Purpose
 
 This project is part of my cloud computing and security learning path. I am using it to practice full-stack development, authentication, database design, deployment, and secure application architecture.
+
+## Features
+
+- Supabase Authentication
+- Student Management
+- Teacher Management
+- Classroom Management
+- Next.js App Router
+- Vercel Deployment
+
+## Architecture
+
+Next.js
+↓
+Supabase Auth
+↓
+Supabase Database
+↓
+Vercel Hosting
+
+## Future Roadmap
+
+- Attendance Tracking
+- Activity Generator
+- Parent Portal
+- Teacher Dashboard
+- Security Hardening
