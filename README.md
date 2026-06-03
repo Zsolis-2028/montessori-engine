@@ -98,3 +98,24 @@ Vercel Hosting
 - Parent Portal
 - Teacher Dashboard
 - Security Hardening
+## Screenshots
+
+### Login
+
+![Login](docs/login-page.png)
+
+### Dashboard
+
+![Dashboard](docs/dashboard-page.png)
+
+### Students
+
+![Students](docs/students-page.png)
+
+### Teachers
+
+![Teachers](docs/teachers-page.png)
+
+### Classrooms
+
+![Classrooms](docs/classrooms-page.png)
