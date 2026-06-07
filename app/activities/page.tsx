@@ -11,22 +11,35 @@ export default function ActivityGenerator() {
   const [loading, setLoading] = useState(false);
 
   const generateActivity = async () => {
+    if (!ageRange || !domain || !material.trim()) {
+      alert("Please select an age range, domain, and material.");
+      return;
+    }
+
     setLoading(true);
     setOutput("");
 
     const prompt = `
-Create a Montessori activity for:
+Create a Montessori-aligned activity for:
+
 Age Range: ${ageRange}
 Domain: ${domain}
-Material: ${material}
+Material or Available Items: ${material}
 
 Include:
+- Activity title
 - Purpose
-- Step-by-step presentation
-- Control of error
+- Developmental goal
+- Step-by-step setup or presentation
+- Safety notes
+- What the teacher should observe
 - Points of interest
 - Extensions
 - Language to use with the child
+
+Important:
+If the age range is infant or toddler, make the activity developmentally appropriate, simple, safe, supervised, and avoid choking hazards.
+If the age range is 3-6 or 6-9, include Montessori presentation language, control of error, and follow-up work.
 `;
 
     const { data, error } = await supabase.functions.invoke(
@@ -177,8 +190,11 @@ Include:
           style={{ padding: 10 }}
         >
           <option value="">Select</option>
-          <option value="3-6">3–6</option>
-          <option value="6-9">6–9</option>
+          <option value="0-12 months">Infant: 0–12 months</option>
+          <option value="12-24 months">Toddler: 12–24 months</option>
+          <option value="0-2 years">Infant/Toddler: 0–2 years</option>
+          <option value="3-6">Primary: 3–6</option>
+          <option value="6-9">Elementary: 6–9</option>
         </select>
 
         <label>Domain</label>
@@ -193,12 +209,15 @@ Include:
           <option value="Math">Math</option>
           <option value="Language">Language</option>
           <option value="Cultural">Cultural</option>
+          <option value="Fine Motor">Fine Motor</option>
+          <option value="Gross Motor">Gross Motor</option>
+          <option value="Sensory">Sensory</option>
         </select>
 
-        <label>Material</label>
+        <label>Material / Available Items</label>
         <input
           type="text"
-          placeholder="Pink Tower, Bead Bars, etc."
+          placeholder="Pink Tower, Bead Bars, rice + bowls, soft blocks, etc."
           value={material}
           onChange={(e) => setMaterial(e.target.value)}
           style={{ padding: 10 }}
