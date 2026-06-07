@@ -3,22 +3,43 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 
-export default function TeachersPage() {
-  const [teachers, setTeachers] = useState<any[]>([]);
-  const [classrooms, setClassrooms] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<any | null>(null);
+type Classroom = {
+  id: string;
+  name: string;
+};
 
+type Teacher = {
+  id: string;
+  name: string;
+  classroom_id: string | null;
+  created_at?: string;
+  classrooms?: {
+    name: string;
+  } | null;
+};
+
+export default function TeachersPage() {
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [classroomId, setClassroomId] = useState("");
 
   async function loadTeachers() {
     const { data, error } = await supabase
       .from("teachers")
-      .select("*, classrooms(name)")
+      .select("id, name, classroom_id, created_at, classrooms(name)")
       .order("created_at", { ascending: false });
 
-    if (!error) setTeachers(data || []);
+    if (error) {
+      console.error("Error loading teachers:", error);
+      return;
+    }
+
+    setTeachers((data as Teacher[]) || []);
   }
 
   async function loadClassrooms() {
@@ -27,129 +48,301 @@ export default function TeachersPage() {
       .select("*")
       .order("name", { ascending: true });
 
-    if (!error) setClassrooms(data || []);
+    if (error) {
+      console.error("Error loading classrooms:", error);
+      return;
+    }
+
+    setClassrooms(data || []);
   }
 
   useEffect(() => {
-    Promise.all([loadTeachers(), loadClassrooms()]).then(() =>
-      setLoading(false)
-    );
-  }, []);
-
-  function startEdit(teacher: any) {
-    setEditing(teacher);
-    setName(teacher.name);
-    setClassroomId(teacher.classroom_id);
-  }
-
-  async function saveTeacher() {
-    if (!name || !classroomId) return;
-
-    if (editing) {
-      await supabase
-        .from("teachers")
-        .update({
-          name,
-          classroom_id: classroomId,
-        })
-        .eq("id", editing.id);
-    } else {
-      await supabase.from("teachers").insert({
-        name,
-        classroom_id: classroomId,
-      });
+    async function loadData() {
+      await Promise.all([loadTeachers(), loadClassrooms()]);
+      setLoading(false);
     }
 
+    loadData();
+  }, []);
+
+  function startAdd() {
+    resetForm();
+    setShowForm(true);
+  }
+
+  function startEdit(teacher: Teacher) {
+    setEditingId(teacher.id);
+    setName(teacher.name || "");
+    setClassroomId(teacher.classroom_id || "");
+    setShowForm(true);
+  }
+
+  async function saveTeacher(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!name.trim()) {
+      alert("Please enter a teacher name.");
+      return;
+    }
+
+    if (!classroomId) {
+      alert("Please select a classroom.");
+      return;
+    }
+
+    const teacherData = {
+      name: name.trim(),
+      classroom_id: classroomId,
+    };
+
+    if (editingId) {
+      const { error } = await supabase
+        .from("teachers")
+        .update(teacherData)
+        .eq("id", editingId);
+
+      if (error) {
+        console.error("Error updating teacher:", error);
+        alert("Could not update teacher.");
+        return;
+      }
+    } else {
+      const { error } = await supabase.from("teachers").insert(teacherData);
+
+      if (error) {
+        console.error("Error adding teacher:", error);
+        alert("Could not add teacher.");
+        return;
+      }
+    }
+
+    resetForm();
+    await loadTeachers();
+  }
+
+  async function deleteTeacher(teacher: Teacher) {
+    const confirmed = confirm(
+      `Are you sure you want to delete ${teacher.name}?`
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("teachers")
+      .delete()
+      .eq("id", teacher.id);
+
+    if (error) {
+      console.error("Error deleting teacher:", error);
+      alert("Could not delete teacher.");
+      return;
+    }
+
+    await loadTeachers();
+  }
+
+  function resetForm() {
+    setShowForm(false);
+    setEditingId(null);
     setName("");
     setClassroomId("");
-    setEditing(null);
-    loadTeachers();
   }
 
-  async function deleteTeacher(id: number) {
-    await supabase.from("teachers").delete().eq("id", id);
-    loadTeachers();
+  if (loading) {
+    return <p style={{ padding: 24 }}>Loading teachers...</p>;
   }
-
-  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Teachers</h1>
+    <div
+      style={{
+        maxWidth: 900,
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+        padding: 24,
+      }}
+    >
+      <div
+        style={{
+          background: "white",
+          borderRadius: 16,
+          padding: 24,
+          marginBottom: 24,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Teachers</h1>
 
-      <div className="mb-6 space-y-3">
-        <input
-          className="border p-2 w-full"
-          placeholder="Teacher name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <select
-          className="border p-2 w-full"
-          value={classroomId}
-          onChange={(e) => setClassroomId(e.target.value)}
-        >
-          <option value="">Select classroom</option>
-          {classrooms.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <p style={{ color: "#64748b" }}>
+          Add, edit, and assign teachers to classrooms.
+        </p>
 
         <button
-          onClick={saveTeacher}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={startAdd}
+          style={{
+            padding: "10px 14px",
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+          }}
         >
-          {editing ? "Update Teacher" : "Add Teacher"}
+          Add Teacher
         </button>
+      </div>
 
-        {editing && (
-          <button
-            onClick={() => {
-              setEditing(null);
-              setName("");
-              setClassroomId("");
+      {showForm && (
+        <form
+          onSubmit={saveTeacher}
+          style={{
+            background: "white",
+            borderRadius: 16,
+            padding: 24,
+            marginBottom: 24,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+            display: "grid",
+            gap: 12,
+          }}
+        >
+          <h2 style={{ marginTop: 0 }}>
+            {editingId ? "Edit Teacher" : "Add Teacher"}
+          </h2>
+
+          <label>Teacher Name</label>
+          <input
+            placeholder="Teacher name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{
+              padding: 10,
+              border: "1px solid #cbd5e1",
+              borderRadius: 8,
             }}
-            className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+          />
+
+          <label>Classroom</label>
+          <select
+            value={classroomId}
+            onChange={(e) => setClassroomId(e.target.value)}
+            style={{
+              padding: 10,
+              border: "1px solid #cbd5e1",
+              borderRadius: 8,
+            }}
           >
-            Cancel
-          </button>
-        )}
-      </div>
+            <option value="">Select a classroom</option>
+            {classrooms.map((classroom) => (
+              <option key={classroom.id} value={classroom.id}>
+                {classroom.name}
+              </option>
+            ))}
+          </select>
 
-      <div className="space-y-3">
-        {teachers.map((t) => (
-          <div
-            key={t.id}
-            className="border p-3 rounded flex justify-between items-center"
-          >
-            <div>
-              <p className="font-semibold">{t.name}</p>
-              <p className="text-sm text-gray-600">
-                Classroom: {t.classrooms?.name || "Unknown"}
-              </p>
-            </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+            <button
+              type="submit"
+              style={{
+                padding: "10px 14px",
+                background: "#16a34a",
+                color: "white",
+                border: "none",
+                borderRadius: 8,
+                cursor: "pointer",
+              }}
+            >
+              {editingId ? "Update Teacher" : "Save Teacher"}
+            </button>
 
-            <div className="space-x-2">
-              <button
-                onClick={() => startEdit(t)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded"
-              >
-                Edit
-              </button>
-
-              <button
-                onClick={() => deleteTeacher(t.id)}
-                className="bg-red-600 text-white px-3 py-1 rounded"
-              >
-                Delete
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={resetForm}
+              style={{
+                padding: "10px 14px",
+                background: "#e5e7eb",
+                color: "#111827",
+                border: "none",
+                borderRadius: 8,
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
           </div>
-        ))}
-      </div>
+        </form>
+      )}
+
+      {teachers.length === 0 ? (
+        <div
+          style={{
+            background: "white",
+            borderRadius: 16,
+            padding: 24,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+          }}
+        >
+          <p>No teachers yet.</p>
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: 16,
+          }}
+        >
+          {teachers.map((teacher) => (
+            <div
+              key={teacher.id}
+              style={{
+                background: "white",
+                borderRadius: 16,
+                padding: 20,
+                boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <h2 style={{ marginTop: 0 }}>
+                {teacher.name || "Unnamed Teacher"}
+              </h2>
+
+              <p>
+                <strong>Classroom:</strong>{" "}
+                {teacher.classrooms?.name || "Not assigned"}
+              </p>
+
+              <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+                <button
+                  onClick={() => startEdit(teacher)}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                  }}
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => deleteTeacher(teacher)}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#dc2626",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
