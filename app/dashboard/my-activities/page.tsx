@@ -48,13 +48,122 @@ export default function MyActivitiesPage() {
     loadActivities();
   }, [router]);
 
+  function escapeHtml(text: string) {
+    return text
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function exportActivity(activity: Activity) {
+    const title = activity.material || "Montessori Activity";
+    const domain = activity.domain || "N/A";
+    const ageRange = activity.age_range || "N/A";
+    const savedDate = activity.created_at
+      ? new Date(activity.created_at).toLocaleString()
+      : "N/A";
+    const content = activity.generated_activity || "";
+
+    const printWindow = window.open("", "_blank");
+
+    if (!printWindow) {
+      alert("Popup blocked. Please allow popups to export this activity.");
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${escapeHtml(title)}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 40px;
+              line-height: 1.6;
+              color: #111827;
+            }
+
+            h1 {
+              font-size: 28px;
+              margin-bottom: 8px;
+            }
+
+            .meta {
+              background: #f3f4f6;
+              padding: 16px;
+              border-radius: 8px;
+              margin-bottom: 24px;
+            }
+
+            .content {
+              white-space: pre-wrap;
+              font-size: 14px;
+            }
+
+            .footer {
+              margin-top: 40px;
+              font-size: 12px;
+              color: #6b7280;
+              border-top: 1px solid #e5e7eb;
+              padding-top: 12px;
+            }
+
+            @media print {
+              body {
+                padding: 24px;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <h1>${escapeHtml(title)}</h1>
+
+          <div class="meta">
+            <p><strong>Domain:</strong> ${escapeHtml(domain)}</p>
+            <p><strong>Age Range:</strong> ${escapeHtml(ageRange)}</p>
+            <p><strong>Saved:</strong> ${escapeHtml(savedDate)}</p>
+          </div>
+
+          <div class="content">${escapeHtml(content)}</div>
+
+          <div class="footer">
+            Generated with Montessori Engine
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+  }
+
   if (loading) return <p style={{ padding: 24 }}>Loading activities...</p>;
 
   return (
     <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
       <h1>My Activities</h1>
 
-      <button onClick={() => router.push("/activities")}>
+      <button
+        onClick={() => router.push("/activities")}
+        style={{
+          padding: "10px 14px",
+          background: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: 8,
+          cursor: "pointer",
+          marginTop: 12,
+        }}
+      >
         Generate New Activity
       </button>
 
@@ -67,12 +176,15 @@ export default function MyActivitiesPage() {
               key={activity.id}
               style={{
                 border: "1px solid #ddd",
-                borderRadius: 8,
-                padding: 16,
+                borderRadius: 12,
+                padding: 18,
                 background: "#fff",
+                boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
               }}
             >
-              <h2>{activity.material || "Untitled Activity"}</h2>
+              <h2 style={{ marginTop: 0 }}>
+                {activity.material || "Untitled Activity"}
+              </h2>
 
               <p>
                 <strong>Domain:</strong> {activity.domain || "N/A"}
@@ -88,6 +200,22 @@ export default function MyActivitiesPage() {
                   ? new Date(activity.created_at).toLocaleString()
                   : "N/A"}
               </p>
+
+              <button
+                onClick={() => exportActivity(activity)}
+                style={{
+                  padding: "9px 12px",
+                  background: "#16a34a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  marginTop: 8,
+                  marginBottom: 12,
+                }}
+              >
+                Export PDF
+              </button>
 
               <pre
                 style={{
