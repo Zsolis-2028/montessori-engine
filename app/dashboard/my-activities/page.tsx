@@ -18,6 +18,7 @@ export default function MyActivitiesPage() {
   const router = useRouter();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadActivities() {
@@ -47,6 +48,14 @@ export default function MyActivitiesPage() {
 
     loadActivities();
   }, [router]);
+
+  function toggleActivity(id: string) {
+    setExpandedIds((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  }
 
   function escapeHtml(text: string) {
     return text
@@ -171,65 +180,93 @@ export default function MyActivitiesPage() {
         <p style={{ marginTop: 20 }}>No saved activities yet.</p>
       ) : (
         <div style={{ marginTop: 24, display: "grid", gap: 16 }}>
-          {activities.map((activity) => (
-            <div
-              key={activity.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 12,
-                padding: 18,
-                background: "#fff",
-                boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
-              }}
-            >
-              <h2 style={{ marginTop: 0 }}>
-                {activity.material || "Untitled Activity"}
-              </h2>
+          {activities.map((activity) => {
+            const isExpanded = expandedIds.includes(activity.id);
 
-              <p>
-                <strong>Domain:</strong> {activity.domain || "N/A"}
-              </p>
-
-              <p>
-                <strong>Age Range:</strong> {activity.age_range || "N/A"}
-              </p>
-
-              <p>
-                <strong>Saved:</strong>{" "}
-                {activity.created_at
-                  ? new Date(activity.created_at).toLocaleString()
-                  : "N/A"}
-              </p>
-
-              <button
-                onClick={() => exportActivity(activity)}
+            return (
+              <div
+                key={activity.id}
                 style={{
-                  padding: "9px 12px",
-                  background: "#16a34a",
-                  color: "white",
-                  border: "none",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  marginTop: 8,
-                  marginBottom: 12,
+                  border: "1px solid #ddd",
+                  borderRadius: 12,
+                  padding: 18,
+                  background: "#fff",
+                  boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
                 }}
               >
-                Export PDF
-              </button>
+                <h2 style={{ marginTop: 0 }}>
+                  {activity.material || "Untitled Activity"}
+                </h2>
 
-              <pre
-                style={{
-                  whiteSpace: "pre-wrap",
-                  background: "#f4f4f4",
-                  padding: 12,
-                  borderRadius: 8,
-                  marginTop: 12,
-                }}
-              >
-                {activity.generated_activity}
-              </pre>
-            </div>
-          ))}
+                <p>
+                  <strong>Domain:</strong> {activity.domain || "N/A"}
+                </p>
+
+                <p>
+                  <strong>Age Range:</strong> {activity.age_range || "N/A"}
+                </p>
+
+                <p>
+                  <strong>Saved:</strong>{" "}
+                  {activity.created_at
+                    ? new Date(activity.created_at).toLocaleString()
+                    : "N/A"}
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    flexWrap: "wrap",
+                    marginTop: 12,
+                  }}
+                >
+                  <button
+                    onClick={() => toggleActivity(activity.id)}
+                    style={{
+                      padding: "9px 12px",
+                      background: "#2563eb",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {isExpanded ? "Hide Activity" : "View Activity"}
+                  </button>
+
+                  <button
+                    onClick={() => exportActivity(activity)}
+                    style={{
+                      padding: "9px 12px",
+                      background: "#16a34a",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Export PDF
+                  </button>
+                </div>
+
+                {isExpanded && (
+                  <pre
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      background: "#f4f4f4",
+                      padding: 12,
+                      borderRadius: 8,
+                      marginTop: 12,
+                      overflowX: "auto",
+                    }}
+                  >
+                    {activity.generated_activity}
+                  </pre>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
