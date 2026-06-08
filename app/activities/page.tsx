@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
 export default function ActivityGenerator() {
+  const router = useRouter();
+
   const [ageRange, setAgeRange] = useState("");
   const [domain, setDomain] = useState("");
   const [material, setMaterial] = useState("");
@@ -53,13 +56,18 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
       console.error("Function error:", error);
       setOutput("Error generating activity.");
     } else {
-      setOutput(data.activity);
+      setOutput(data?.activity || "No activity returned.");
     }
 
     setLoading(false);
   };
 
   const saveActivity = async () => {
+    if (!output) {
+      alert("Generate an activity first.");
+      return;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -69,13 +77,19 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
       return;
     }
 
-    await supabase.from("activities").insert({
+    const { error } = await supabase.from("activities").insert({
       user_id: user.id,
       domain,
       material,
       age_range: ageRange,
       generated_activity: output,
     });
+
+    if (error) {
+      console.error("Save error:", error);
+      alert("Error saving activity.");
+      return;
+    }
 
     alert("Activity saved!");
   };
@@ -181,6 +195,43 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
   return (
     <div style={{ padding: 24, maxWidth: 700, margin: "0 auto" }}>
       <h1>Activity Generator</h1>
+
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          flexWrap: "wrap",
+          marginBottom: 20,
+        }}
+      >
+        <button
+          onClick={() => router.push("/dashboard")}
+          style={{
+            padding: "10px 14px",
+            background: "#e5e7eb",
+            color: "#111827",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+          }}
+        >
+          Back to Dashboard
+        </button>
+
+        <button
+          onClick={() => router.push("/dashboard/my-activities")}
+          style={{
+            padding: "10px 14px",
+            background: "#16a34a",
+            color: "white",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+          }}
+        >
+          My Activities
+        </button>
+      </div>
 
       <div style={{ display: "grid", gap: 12 }}>
         <label>Age Range</label>
