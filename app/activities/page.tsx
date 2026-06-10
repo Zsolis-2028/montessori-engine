@@ -77,8 +77,21 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
       return;
     }
 
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("school_id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (profileError || !profile?.school_id) {
+      console.error("Profile error:", profileError);
+      alert("Your school profile is missing. Please contact an admin.");
+      return;
+    }
+
     const { error } = await supabase.from("activities").insert({
       user_id: user.id,
+      school_id: profile.school_id,
       domain,
       material,
       age_range: ageRange,
