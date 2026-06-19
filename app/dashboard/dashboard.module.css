@@ -1,0 +1,11 @@
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .cardGrid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
