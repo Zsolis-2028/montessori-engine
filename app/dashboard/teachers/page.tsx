@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { getCurrentSchoolProfile } from "@/lib/supabase/profile";
 
 type Classroom = {
   id: string;
@@ -19,19 +21,23 @@ type Teacher = {
 };
 
 export default function TeachersPage() {
+  const router = useRouter();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState("");
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [classroomId, setClassroomId] = useState("");
 
-  async function loadTeachers() {
+  async function loadTeachers(forSchoolId: string) {
     const { data, error } = await supabase
       .from("teachers")
       .select("id, name, classroom_id, created_at, classrooms(name)")
+      .eq("school_id", forSchoolId)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -42,10 +48,11 @@ export default function TeachersPage() {
     setTeachers((data as Teacher[]) || []);
   }
 
-  async function loadClassrooms() {
+  async function loadClassrooms(forSchoolId: string) {
     const { data, error } = await supabase
       .from("classrooms")
       .select("*")
+      .eq("school_id", forSchoolId)
       .order("name", { ascending: true });
 
     if (error) {
@@ -58,12 +65,36 @@ export default function TeachersPage() {
 
   useEffect(() => {
     async function loadData() {
-      await Promise.all([loadTeachers(), loadClassrooms()]);
+      const profile = await getCurrentSchoolProfile();
+
+      if (profile.status === "unauthenticated") {
+        router.push("/login");
+        return;
+      }
+
+      if (profile.status === "missing-profile") {
+        setProfileError(
+          "Your school profile is missing. Please contact an admin."
+        );
+        setLoading(false);
+        return;
+      }
+
+      if (profile.role !== "school_admin") {
+        router.push("/dashboard");
+        return;
+      }
+
+      setSchoolId(profile.schoolId);
+      await Promise.all([
+        loadTeachers(profile.schoolId),
+        loadClassrooms(profile.schoolId),
+      ]);
       setLoading(false);
     }
 
     loadData();
-  }, []);
+  }, [router]);
 
   function startAdd() {
     resetForm();
@@ -90,15 +121,15 @@ export default function TeachersPage() {
       return;
     }
 
-    const teacherData = {
-      name: name.trim(),
-      classroom_id: classroomId,
-    };
+    if (!schoolId) {
+      alert("Your school profile is missing. Please contact an admin.");
+      return;
+    }
 
     if (editingId) {
       const { error } = await supabase
         .from("teachers")
-        .update(teacherData)
+        .update({ name: name.trim(), classroom_id: classroomId })
         .eq("id", editingId);
 
       if (error) {
@@ -107,7 +138,11 @@ export default function TeachersPage() {
         return;
       }
     } else {
-      const { error } = await supabase.from("teachers").insert(teacherData);
+      const { error } = await supabase.from("teachers").insert({
+        name: name.trim(),
+        classroom_id: classroomId,
+        school_id: schoolId,
+      });
 
       if (error) {
         console.error("Error adding teacher:", error);
@@ -117,10 +152,12 @@ export default function TeachersPage() {
     }
 
     resetForm();
-    await loadTeachers();
+    await loadTeachers(schoolId);
   }
 
   async function deleteTeacher(teacher: Teacher) {
+    if (!schoolId) return;
+
     const confirmed = confirm(
       `Are you sure you want to delete ${teacher.name}?`
     );
@@ -138,7 +175,7 @@ export default function TeachersPage() {
       return;
     }
 
-    await loadTeachers();
+    await loadTeachers(schoolId);
   }
 
   function resetForm() {
@@ -150,6 +187,10 @@ export default function TeachersPage() {
 
   if (loading) {
     return <p style={{ padding: 24 }}>Loading teachers...</p>;
+  }
+
+  if (profileError) {
+    return <p style={{ padding: 24 }}>{profileError}</p>;
   }
 
   return (

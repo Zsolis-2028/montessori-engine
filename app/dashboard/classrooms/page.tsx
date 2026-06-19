@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { getCurrentSchoolProfile } from "@/lib/supabase/profile";
 
 type Classroom = {
   id: string;
@@ -10,17 +12,22 @@ type Classroom = {
 };
 
 export default function ClassroomsPage() {
+  const router = useRouter();
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
+  const [schoolId, setSchoolId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [profileError, setProfileError] = useState("");
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
 
-  async function loadClassrooms() {
+  async function loadClassrooms(forSchoolId: string) {
     const { data, error } = await supabase
       .from("classrooms")
       .select("*")
+      .eq("school_id", forSchoolId)
       .order("name", { ascending: true });
 
     if (error) {
@@ -30,12 +37,33 @@ export default function ClassroomsPage() {
     }
 
     setClassrooms(data || []);
-    setLoading(false);
   }
 
   useEffect(() => {
-    loadClassrooms();
-  }, []);
+    async function loadData() {
+      const profile = await getCurrentSchoolProfile();
+
+      if (profile.status === "unauthenticated") {
+        router.push("/login");
+        return;
+      }
+
+      if (profile.status === "missing-profile") {
+        setProfileError(
+          "Your school profile is missing. Please contact an admin."
+        );
+        setLoading(false);
+        return;
+      }
+
+      setSchoolId(profile.schoolId);
+      setIsAdmin(profile.role === "school_admin");
+      await loadClassrooms(profile.schoolId);
+      setLoading(false);
+    }
+
+    loadData();
+  }, [router]);
 
   function startAdd() {
     resetForm();
@@ -56,14 +84,15 @@ export default function ClassroomsPage() {
       return;
     }
 
-    const classroomData = {
-      name: name.trim(),
-    };
+    if (!schoolId) {
+      alert("Your school profile is missing. Please contact an admin.");
+      return;
+    }
 
     if (editingId) {
       const { error } = await supabase
         .from("classrooms")
-        .update(classroomData)
+        .update({ name: name.trim() })
         .eq("id", editingId);
 
       if (error) {
@@ -74,7 +103,7 @@ export default function ClassroomsPage() {
     } else {
       const { error } = await supabase
         .from("classrooms")
-        .insert(classroomData);
+        .insert({ name: name.trim(), school_id: schoolId });
 
       if (error) {
         console.error("Error adding classroom:", error);
@@ -84,10 +113,12 @@ export default function ClassroomsPage() {
     }
 
     resetForm();
-    await loadClassrooms();
+    await loadClassrooms(schoolId);
   }
 
   async function deleteClassroom(classroom: Classroom) {
+    if (!schoolId) return;
+
     const confirmed = confirm(
       `Are you sure you want to delete ${classroom.name}?`
     );
@@ -105,7 +136,7 @@ export default function ClassroomsPage() {
       return;
     }
 
-    await loadClassrooms();
+    await loadClassrooms(schoolId);
   }
 
   function resetForm() {
@@ -116,6 +147,10 @@ export default function ClassroomsPage() {
 
   if (loading) {
     return <p style={{ padding: 24 }}>Loading classrooms...</p>;
+  }
+
+  if (profileError) {
+    return <p style={{ padding: 24 }}>{profileError}</p>;
   }
 
   return (
@@ -272,19 +307,21 @@ export default function ClassroomsPage() {
                   Edit
                 </button>
 
-                <button
-                  onClick={() => deleteClassroom(classroom)}
-                  style={{
-                    padding: "8px 12px",
-                    background: "#dc2626",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                  }}
-                >
-                  Delete
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => deleteClassroom(classroom)}
+                    style={{
+                      padding: "8px 12px",
+                      background: "#dc2626",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))}

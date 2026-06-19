@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
+import { getCurrentSchoolProfile } from '@/lib/supabase/profile'
 
 type Student = {
   id: string
@@ -17,9 +19,13 @@ type Classroom = {
 }
 
 export default function StudentsPage() {
+  const router = useRouter()
   const [students, setStudents] = useState<Student[]>([])
   const [classrooms, setClassrooms] = useState<Classroom[]>([])
   const [loading, setLoading] = useState(true)
+  const [schoolId, setSchoolId] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [profileError, setProfileError] = useState('')
 
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
@@ -27,10 +33,11 @@ export default function StudentsPage() {
   const [classroom, setClassroom] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
 
-  async function reloadStudents() {
+  async function reloadStudents(forSchoolId: string) {
     const { data, error } = await supabase
       .from('students')
       .select('*')
+      .eq('school_id', forSchoolId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -43,11 +50,29 @@ export default function StudentsPage() {
 
   useEffect(() => {
     async function loadData() {
-      await reloadStudents()
+      const profile = await getCurrentSchoolProfile()
+
+      if (profile.status === 'unauthenticated') {
+        router.push('/login')
+        return
+      }
+
+      if (profile.status === 'missing-profile') {
+        setProfileError(
+          'Your school profile is missing. Please contact an admin.'
+        )
+        setLoading(false)
+        return
+      }
+
+      setSchoolId(profile.schoolId)
+      setIsAdmin(profile.role === 'school_admin')
+      await reloadStudents(profile.schoolId)
 
       const { data, error } = await supabase
         .from('classrooms')
         .select('*')
+        .eq('school_id', profile.schoolId)
         .order('name', { ascending: true })
 
       if (error) {
@@ -60,7 +85,7 @@ export default function StudentsPage() {
     }
 
     loadData()
-  }, [])
+  }, [router])
 
   function startAdd() {
     resetForm()
@@ -80,6 +105,11 @@ export default function StudentsPage() {
 
     if (!name.trim()) {
       alert('Please enter a student name.')
+      return
+    }
+
+    if (!schoolId) {
+      alert('Your school profile is missing. Please contact an admin.')
       return
     }
 
@@ -103,7 +133,7 @@ export default function StudentsPage() {
     } else {
       const { error } = await supabase
         .from('students')
-        .insert(studentData)
+        .insert({ ...studentData, school_id: schoolId })
 
       if (error) {
         console.error('Error adding student:', error)
@@ -113,10 +143,12 @@ export default function StudentsPage() {
     }
 
     resetForm()
-    await reloadStudents()
+    await reloadStudents(schoolId)
   }
 
   async function handleDeleteStudent(student: Student) {
+    if (!schoolId) return
+
     const confirmed = confirm(
       `Are you sure you want to delete ${student.name}?`
     )
@@ -134,7 +166,7 @@ export default function StudentsPage() {
       return
     }
 
-    await reloadStudents()
+    await reloadStudents(schoolId)
   }
 
   function resetForm() {
@@ -147,6 +179,10 @@ export default function StudentsPage() {
 
   if (loading) {
     return <p style={{ padding: 24 }}>Loading students...</p>
+  }
+
+  if (profileError) {
+    return <p style={{ padding: 24 }}>{profileError}</p>
   }
 
   return (
@@ -339,19 +375,21 @@ export default function StudentsPage() {
                   Edit
                 </button>
 
-                <button
-                  onClick={() => handleDeleteStudent(student)}
-                  style={{
-                    padding: '8px 12px',
-                    background: '#dc2626',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 8,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Delete
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeleteStudent(student)}
+                    style={{
+                      padding: '8px 12px',
+                      background: '#dc2626',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))}

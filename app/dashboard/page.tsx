@@ -4,11 +4,15 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
+import { getCurrentSchoolProfile, type UserRole } from '@/lib/supabase/profile'
 
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
+  const [role, setRole] = useState<UserRole | null>(null)
+  const [schoolName, setSchoolName] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [profileError, setProfileError] = useState('')
 
   useEffect(() => {
     async function loadUser() {
@@ -16,8 +20,20 @@ export default function DashboardPage() {
 
       if (!data.user) {
         router.push('/login')
-      } else {
-        setUser(data.user)
+        return
+      }
+
+      setUser(data.user)
+
+      const profile = await getCurrentSchoolProfile()
+
+      if (profile.status === 'missing-profile') {
+        setProfileError(
+          'Your school profile is missing. Please contact an admin.'
+        )
+      } else if (profile.status === 'ok') {
+        setRole(profile.role)
+        setSchoolName(profile.schoolName)
       }
 
       setLoading(false)
@@ -25,6 +41,8 @@ export default function DashboardPage() {
 
     loadUser()
   }, [router])
+
+  const isAdmin = role === 'school_admin'
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -47,11 +65,15 @@ export default function DashboardPage() {
       description: 'Manage student records and classroom assignments.',
       path: '/dashboard/students',
     },
-    {
-      title: 'Teachers',
-      description: 'Manage teacher records and classroom assignments.',
-      path: '/dashboard/teachers',
-    },
+    ...(isAdmin
+      ? [
+          {
+            title: 'Teachers',
+            description: 'Manage teacher records and classroom assignments.',
+            path: '/dashboard/teachers',
+          },
+        ]
+      : []),
     {
       title: 'Classrooms',
       description: 'Manage Montessori classroom groups.',
@@ -98,6 +120,17 @@ export default function DashboardPage() {
           <p style={{ color: '#475569', marginTop: 8 }}>
             Welcome, {user?.email}
           </p>
+
+          {!profileError && (
+            <p style={{ color: '#475569', marginTop: 4 }}>
+              {schoolName ?? 'Unknown school'} &middot;{' '}
+              {isAdmin ? 'School Admin' : 'Teacher'}
+            </p>
+          )}
+
+          {profileError && (
+            <p style={{ color: '#b91c1c', marginTop: 4 }}>{profileError}</p>
+          )}
 
           <p style={{ color: '#64748b', maxWidth: 650 }}>
             Teacher tools for Montessori lesson planning, saved activities,
