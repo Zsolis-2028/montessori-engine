@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { colors } from "@/lib/theme";
 
 export default function ActivityGenerator() {
   const router = useRouter();
@@ -207,7 +208,7 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
 
   return (
     <div style={{ padding: 24, maxWidth: 700, margin: "0 auto" }}>
-      <h1>Activity Generator</h1>
+      <h1 style={{ color: colors.navy }}>Activity Generator</h1>
 
       <div
         style={{
@@ -292,12 +293,13 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
           disabled={loading}
           style={{
             padding: 12,
-            background: "#2563eb",
-            color: "white",
+            background: colors.gold,
+            color: colors.navy,
             border: "none",
             borderRadius: 8,
             cursor: "pointer",
             marginTop: 8,
+            fontWeight: 600,
           }}
         >
           {loading ? "Generating..." : "Generate Activity"}

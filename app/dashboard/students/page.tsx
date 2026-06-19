@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import { getCurrentSchoolProfile } from '@/lib/supabase/profile'
+import { colors } from '@/lib/theme'
 
 type Student = {
   id: string
@@ -203,7 +204,7 @@ export default function StudentsPage() {
           boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
         }}
       >
-        <h1 style={{ margin: 0 }}>Students</h1>
+        <h1 style={{ margin: 0, color: colors.navy }}>Students</h1>
         <p style={{ color: '#64748b' }}>
           Add, edit, and manage student records for classroom tracking.
         </p>
@@ -212,11 +213,12 @@ export default function StudentsPage() {
           onClick={startAdd}
           style={{
             padding: '10px 14px',
-            background: '#2563eb',
-            color: 'white',
+            background: colors.gold,
+            color: colors.navy,
             border: 'none',
             borderRadius: 8,
             cursor: 'pointer',
+            fontWeight: 600,
           }}
         >
           Add Student

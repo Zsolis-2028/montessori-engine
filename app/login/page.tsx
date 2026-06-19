@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { colors } from '@/lib/theme'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -27,52 +28,85 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: '50px auto', fontFamily: 'sans-serif' }}>
-      <h1 style={{ marginBottom: 20 }}>Login</h1>
-
-      <form
-        onSubmit={handleLogin}
-        style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+    <div style={{ minHeight: '100vh', background: colors.bg, fontFamily: 'sans-serif' }}>
+      <header
+        style={{
+          background: colors.navy,
+          padding: '16px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+        }}
       >
-        <label>Email</label>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ padding: 10, border: '1px solid #ccc', borderRadius: 4 }}
-        />
-
-        <label>Password</label>
-        <input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: 10, border: '1px solid #ccc', borderRadius: 4 }}
-        />
-
-        <button
-          type="submit"
+        <span
           style={{
-            padding: 10,
-            background: '#0070f3',
-            color: 'white',
-            border: 'none',
-            borderRadius: 4,
-            cursor: 'pointer',
-            marginTop: 10,
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            background: colors.gold,
+            display: 'inline-block',
+          }}
+        />
+        <strong style={{ color: '#fff', fontSize: 18 }}>Montessori Engine</strong>
+      </header>
+
+      <div style={{ maxWidth: 400, margin: '50px auto', padding: '0 24px' }}>
+        <div
+          style={{
+            background: colors.card,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 16,
+            padding: 28,
           }}
         >
-          Login
-        </button>
-      </form>
+          <h1 style={{ marginTop: 0, marginBottom: 20, color: colors.navy }}>Login</h1>
 
-      {error && (
-        <p style={{ color: 'red', marginTop: 10 }}>
-          {error}
-        </p>
-      )}
+          <form
+            onSubmit={handleLogin}
+            style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+          >
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ padding: 10, border: `1px solid ${colors.border}`, borderRadius: 4 }}
+            />
+
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ padding: 10, border: `1px solid ${colors.border}`, borderRadius: 4 }}
+            />
+
+            <button
+              type="submit"
+              style={{
+                padding: 10,
+                background: colors.gold,
+                color: colors.navy,
+                border: 'none',
+                borderRadius: 4,
+                cursor: 'pointer',
+                marginTop: 10,
+                fontWeight: 600,
+              }}
+            >
+              Login
+            </button>
+          </form>
+
+          {error && (
+            <p style={{ color: 'red', marginTop: 10 }}>
+              {error}
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

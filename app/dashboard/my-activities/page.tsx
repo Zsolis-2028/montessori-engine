@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { colors } from "@/lib/theme";
 
 type Activity = {
   id: string;
@@ -159,7 +160,7 @@ export default function MyActivitiesPage() {
 
   return (
     <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
-      <h1>My Activities</h1>
+      <h1 style={{ color: colors.navy }}>My Activities</h1>
 
       <button
         onClick={() => router.push("/activities")}
@@ -225,7 +226,7 @@ export default function MyActivitiesPage() {
                     onClick={() => toggleActivity(activity.id)}
                     style={{
                       padding: "9px 12px",
-                      background: "#2563eb",
+                      background: colors.navy,
                       color: "white",
                       border: "none",
                       borderRadius: 8,
@@ -239,11 +240,12 @@ export default function MyActivitiesPage() {
                     onClick={() => exportActivity(activity)}
                     style={{
                       padding: "9px 12px",
-                      background: "#16a34a",
-                      color: "white",
+                      background: colors.gold,
+                      color: colors.navy,
                       border: "none",
                       borderRadius: 8,
                       cursor: "pointer",
+                      fontWeight: 600,
                     }}
                   >
                     Export PDF
