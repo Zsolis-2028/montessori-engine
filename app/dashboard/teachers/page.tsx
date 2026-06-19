@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { getCurrentSchoolProfile } from "@/lib/supabase/profile";
 import { colors } from "@/lib/theme";
+import { TopBar } from "@/components/TopBar";
 
 type Classroom = {
   id: string;
@@ -195,6 +196,8 @@ export default function TeachersPage() {
   }
 
   return (
+    <div style={{ minHeight: "100vh", background: colors.bg }}>
+    <TopBar />
     <div
       style={{
         maxWidth: 900,
@@ -386,6 +389,7 @@ export default function TeachersPage() {
           ))}
         </div>
       )}
+    </div>
     </div>
   );
 }

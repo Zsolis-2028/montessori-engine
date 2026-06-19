@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ReactMarkdown from "react-markdown";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { colors } from "@/lib/theme";
+import { TopBar } from "@/components/TopBar";
+import styles from "../markdown.module.css";
 
 export default function ActivityGenerator() {
   const router = useRouter();
@@ -159,8 +163,20 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
             }
 
             .content {
-              white-space: pre-wrap;
               font-size: 14px;
+            }
+
+            .content h1, .content h2, .content h3, .content h4 {
+              margin: 18px 0 6px;
+            }
+
+            .content ul, .content ol {
+              padding-left: 22px;
+              line-height: 1.6;
+            }
+
+            .content p {
+              line-height: 1.6;
             }
 
             .footer {
@@ -188,7 +204,7 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
             <p><strong>Generated:</strong> ${escapeHtml(savedDate)}</p>
           </div>
 
-          <div class="content">${escapeHtml(output)}</div>
+          <div class="content">${renderToStaticMarkup(<ReactMarkdown>{output}</ReactMarkdown>)}</div>
 
           <div class="footer">
             Generated with Montessori Engine
@@ -207,8 +223,10 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 700, margin: "0 auto" }}>
-      <h1 style={{ color: colors.navy }}>Activity Generator</h1>
+    <div style={{ minHeight: "100vh", background: colors.bg }}>
+      <TopBar />
+      <div style={{ padding: 24, maxWidth: 700, margin: "0 auto" }}>
+        <h1 style={{ color: colors.navy }}>Activity Generator</h1>
 
       <div
         style={{
@@ -340,18 +358,12 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
             </button>
           </div>
 
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              background: "#f4f4f4",
-              padding: 12,
-              borderRadius: 8,
-            }}
-          >
-            {output}
-          </pre>
+          <div className={styles.markdown}>
+            <ReactMarkdown>{output}</ReactMarkdown>
+          </div>
         </>
       )}
+      </div>
     </div>
   );
 }

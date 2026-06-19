@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { colors } from '@/lib/theme'
+import { TopBar } from '@/components/TopBar'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -29,26 +30,7 @@ export default function LoginPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: colors.bg, fontFamily: 'sans-serif' }}>
-      <header
-        style={{
-          background: colors.navy,
-          padding: '16px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-        }}
-      >
-        <span
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: '50%',
-            background: colors.gold,
-            display: 'inline-block',
-          }}
-        />
-        <strong style={{ color: '#fff', fontSize: 18 }}>Montessori Engine</strong>
-      </header>
+      <TopBar />
 
       <div style={{ maxWidth: 400, margin: '50px auto', padding: '0 24px' }}>
         <div

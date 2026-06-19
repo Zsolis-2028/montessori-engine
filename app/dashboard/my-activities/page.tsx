@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ReactMarkdown from "react-markdown";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { colors } from "@/lib/theme";
+import { TopBar } from "@/components/TopBar";
+import styles from "../../markdown.module.css";
 
 type Activity = {
   id: string;
@@ -109,8 +113,20 @@ export default function MyActivitiesPage() {
             }
 
             .content {
-              white-space: pre-wrap;
               font-size: 14px;
+            }
+
+            .content h1, .content h2, .content h3, .content h4 {
+              margin: 18px 0 6px;
+            }
+
+            .content ul, .content ol {
+              padding-left: 22px;
+              line-height: 1.6;
+            }
+
+            .content p {
+              line-height: 1.6;
             }
 
             .footer {
@@ -138,7 +154,7 @@ export default function MyActivitiesPage() {
             <p><strong>Saved:</strong> ${escapeHtml(savedDate)}</p>
           </div>
 
-          <div class="content">${escapeHtml(content)}</div>
+          <div class="content">${renderToStaticMarkup(<ReactMarkdown>{content}</ReactMarkdown>)}</div>
 
           <div class="footer">
             Generated with Montessori Engine
@@ -159,7 +175,9 @@ export default function MyActivitiesPage() {
   if (loading) return <p style={{ padding: 24 }}>Loading activities...</p>;
 
   return (
-    <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", background: colors.bg }}>
+      <TopBar />
+      <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
       <h1 style={{ color: colors.navy }}>My Activities</h1>
 
       <button
@@ -253,24 +271,19 @@ export default function MyActivitiesPage() {
                 </div>
 
                 {isExpanded && (
-                  <pre
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      background: "#f4f4f4",
-                      padding: 12,
-                      borderRadius: 8,
-                      marginTop: 12,
-                      overflowX: "auto",
-                    }}
+                  <div
+                    className={styles.markdown}
+                    style={{ marginTop: 12, overflowX: "auto" }}
                   >
-                    {activity.generated_activity}
-                  </pre>
+                    <ReactMarkdown>{activity.generated_activity ?? ""}</ReactMarkdown>
+                  </div>
                 )}
               </div>
             );
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }

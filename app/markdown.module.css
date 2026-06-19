@@ -1,0 +1,36 @@
+.markdown {
+  background: #f4f4f4;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  color: var(--color-navy);
+  margin: 16px 0 6px;
+}
+
+.markdown h1:first-child,
+.markdown h2:first-child,
+.markdown h3:first-child,
+.markdown h4:first-child {
+  margin-top: 0;
+}
+
+.markdown p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 8px 0;
+  padding-left: 22px;
+  line-height: 1.6;
+}
+
+.markdown strong {
+  color: var(--color-navy);
+}
