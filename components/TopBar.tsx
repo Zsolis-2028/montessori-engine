@@ -6,11 +6,12 @@ export function TopBar() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const navLinks = [
-    { label: 'Generate', href: '/activities' },
-    { label: 'My Activities', href: '/dashboard/my-activities' },
-    { label: 'Dashboard', href: '/dashboard' },
-  ]
+ const navLinks = [
+  { label: 'Generate', href: '/activities' },
+  { label: 'Observations', href: '/observations' },
+  { label: 'My Activities', href: '/dashboard/my-activities' },
+  { label: 'Dashboard', href: '/dashboard' },
+]
 
   return (
     <header
