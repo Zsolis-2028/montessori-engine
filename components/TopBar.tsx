@@ -9,6 +9,7 @@ export function TopBar() {
  const navLinks = [
   { label: 'Generate', href: '/activities' },
   { label: 'Observations', href: '/observations' },
+  { label: 'Daily Planner', href: '/daily-planner' },
   { label: 'My Activities', href: '/dashboard/my-activities' },
   { label: 'Dashboard', href: '/dashboard' },
 ]
