@@ -74,7 +74,7 @@ Generate a full day plan for any Montessori classroom — infant through Element
 ## Built By
 
 Zachary Solis — Student at Hallmark University, San Antonio TX  
-ISSA Mentorship Program — Mentor: Robert Cooper, CDW  
+
 
 📧 zach.solis@icloud.com  
 🔗 https://montessori-engine.vercel.app
