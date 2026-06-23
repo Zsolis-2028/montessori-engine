@@ -4,7 +4,7 @@ import { colors } from '@/lib/theme'
 export default function HomePage() {
   return (
     <div style={{ minHeight: '100vh', background: colors.bg, fontFamily: 'Arial, sans-serif' }}>
-      
+
       {/* Nav */}
       <header style={{ background: colors.navy, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -15,9 +15,9 @@ export default function HomePage() {
           <Link href="/login" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: 14, padding: '8px 16px' }}>
             Log In
           </Link>
-          <Link href="/login" style={{ background: colors.gold, color: colors.navy, textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '8px 16px', borderRadius: 6 }}>
-            Get Started
-          </Link>
+          <a href="mailto:zsolis2028@gmail.com" style={{ background: colors.gold, color: colors.navy, textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '8px 16px', borderRadius: 6 }}>
+            Request Access
+          </a>
         </div>
       </header>
 
@@ -30,7 +30,7 @@ export default function HomePage() {
         <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 18, maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
           Generate activities, write observation notes, and plan full days — in seconds. Built specifically for Montessori teachers, not general AI.
         </p>
-        <Link href="/login" style={{
+        <a href="mailto:zsolis2028@gmail.com" style={{
           display: 'inline-block',
           background: colors.gold,
           color: colors.navy,
@@ -40,8 +40,8 @@ export default function HomePage() {
           borderRadius: 8,
           textDecoration: 'none',
         }}>
-          Start Free Trial
-        </Link>
+          Request Access
+        </a>
       </section>
 
       {/* 3 Agents */}
@@ -50,7 +50,6 @@ export default function HomePage() {
           3 AI Agents. One Platform.
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
-          
           {[
             {
               emoji: '🎯',
@@ -70,7 +69,7 @@ export default function HomePage() {
           ].map((card) => (
             <div key={card.title} style={{
               background: '#fff',
-              border: `1px solid ${colors.border ?? '#d0d8ea'}`,
+              border: `1px solid #d0d8ea`,
               borderRadius: 12,
               padding: 28,
               boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
@@ -109,53 +108,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section style={{ padding: '64px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
-        <h2 style={{ color: colors.navy, fontSize: 28, fontWeight: 700, marginBottom: 8 }}>Simple Pricing</h2>
-        <p style={{ color: '#6b7280', marginBottom: 40 }}>No hidden fees. Cancel anytime.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
-          {[
-            { plan: 'Basic', price: '$200', desc: 'Up to 5 teachers', features: ['All 3 AI agents', 'Activity library', 'Email support'] },
-            { plan: 'School', price: '$299', desc: 'Unlimited teachers', features: ['All 3 AI agents', 'Activity library', 'Priority support'], highlight: true },
-            { plan: 'District', price: '$599', desc: 'Multiple campuses', features: ['All 3 AI agents', 'Admin dashboard', 'Dedicated support'] },
-          ].map((tier) => (
-            <div key={tier.plan} style={{
-              background: tier.highlight ? colors.navy : '#fff',
-              border: `2px solid ${tier.highlight ? colors.gold : '#d0d8ea'}`,
-              borderRadius: 12,
-              padding: 28,
-              boxShadow: tier.highlight ? '0 4px 20px rgba(26,36,68,0.15)' : '0 2px 8px rgba(0,0,0,0.06)',
-            }}>
-              <h3 style={{ color: tier.highlight ? colors.gold : colors.navy, fontWeight: 700, fontSize: 20, marginBottom: 4 }}>{tier.plan}</h3>
-              <div style={{ color: tier.highlight ? '#fff' : colors.navy, fontSize: 36, fontWeight: 800, margin: '12px 0 4px' }}>{tier.price}<span style={{ fontSize: 16, fontWeight: 400 }}>/mo</span></div>
-              <p style={{ color: tier.highlight ? 'rgba(255,255,255,0.7)' : '#6b7280', fontSize: 14, marginBottom: 20 }}>{tier.desc}</p>
-              {tier.features.map((f) => (
-                <p key={f} style={{ color: tier.highlight ? 'rgba(255,255,255,0.85)' : '#374151', fontSize: 14, marginBottom: 8 }}>✓ {f}</p>
-              ))}
-              <Link href="/login" style={{
-                display: 'block',
-                marginTop: 20,
-                background: tier.highlight ? colors.gold : colors.navy,
-                color: tier.highlight ? colors.navy : '#fff',
-                fontWeight: 700,
-                fontSize: 14,
-                padding: '12px',
-                borderRadius: 6,
-                textDecoration: 'none',
-                textAlign: 'center',
-              }}>
-                Get Started
-              </Link>
-            </div>
-          ))}
-        </div>
+      {/* CTA */}
+      <section style={{ padding: '64px 24px', textAlign: 'center' }}>
+        <h2 style={{ color: colors.navy, fontSize: 28, fontWeight: 700, marginBottom: 12 }}>
+          Ready to save hours every week?
+        </h2>
+        <p style={{ color: '#6b7280', fontSize: 16, marginBottom: 32 }}>
+          Join Montessori schools already using AI to work smarter.
+        </p>
+        <a href="mailto:zsolis2028@gmail.com" style={{
+          display: 'inline-block',
+          background: colors.navy,
+          color: '#fff',
+          fontWeight: 700,
+          fontSize: 16,
+          padding: '14px 32px',
+          borderRadius: 8,
+          textDecoration: 'none',
+        }}>
+          Request Access
+        </a>
       </section>
 
       {/* Footer */}
-      <footer style={{ background: colors.navy, padding: '24px', textAlign: 'center' }}>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>© 2026 Montessori Engine. Built for educators who change lives.</p>
-      </footer>
-
-    </div>
-  )
-}
+      <footer style={{ background: colors.navy, padding: '24px',
