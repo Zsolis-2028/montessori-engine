@@ -15,7 +15,7 @@ export default function HomePage() {
           <Link href="/login" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: 14, padding: '8px 16px' }}>
             Log In
           </Link>
-          <a href="mailto:zsolis2028@gmail.com" style={{ background: colors.gold, color: colors.navy, textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '8px 16px', borderRadius: 6 }}>
+          <a href="mailto:zach.solis@icloud.com" style={{ background: colors.gold, color: colors.navy, textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '8px 16px', borderRadius: 6 }}>
             Request Access
           </a>
         </div>
