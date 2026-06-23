@@ -30,7 +30,7 @@ export default function HomePage() {
         <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 18, maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
           Generate activities, write observation notes, and plan full days — in seconds. Built specifically for Montessori teachers, not general AI.
         </p>
-        <a href="mailto:zsolis2028@gmail.com" style={{
+        <a href="mailto:zach.solis@icloud.com" style={{
           display: 'inline-block',
           background: colors.gold,
           color: colors.navy,
@@ -116,7 +116,7 @@ export default function HomePage() {
         <p style={{ color: '#6b7280', fontSize: 16, marginBottom: 32 }}>
           Join Montessori schools already using AI to work smarter.
         </p>
-        <a href="mailto:zsolis2028@gmail.com" style={{
+        <a href="mailto:zach.solis@icloud.com" style={{
           display: 'inline-block',
           background: colors.navy,
           color: '#fff',
