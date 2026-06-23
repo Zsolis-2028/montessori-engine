@@ -101,7 +101,7 @@ Safety note: All activities must be safe for ${roomType} — no choking hazards 
             <option value="Mixed infant/toddler room (0-36 months)">Mixed infant/toddler room (0-36 months)</option>
             <option value="Primary classroom (3-6)">Primary classroom (3-6)</option>
             <option value="Lower Elementary (6-9)">Lower Elementary (6-9)</option>
-            <option value="Upper Elementary (9-12)">Upper Elementary (9-12)</option>
+
           </select>
 
           <label style={{ fontWeight: 600, color: colors.navy }}>Number of Children</label>
