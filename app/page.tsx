@@ -130,5 +130,11 @@ export default function HomePage() {
         </a>
       </section>
 
-      {/* Footer */}
-      <footer style={{ background: colors.navy, padding: '24px',
+     {/* Footer */}
+      <footer style={{ background: colors.navy, padding: '24px', textAlign: 'center' }}>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>© 2026 Montessori Engine. Built for educators who change lives.</p>
+      </footer>
+
+    </div>
+  )
+}
