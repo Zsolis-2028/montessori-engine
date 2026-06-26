@@ -20,7 +20,7 @@ export default function SignupPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signUp({
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -28,8 +28,30 @@ export default function SignupPage() {
       },
     })
 
-    if (error) {
-      setError(error.message)
+    if (authError || !authData.user) {
+      setError(authError?.message ?? 'Signup failed. Please try again.')
+      setLoading(false)
+      return
+    }
+
+    const { data: school, error: schoolError } = await supabase
+      .from('schools')
+      .insert({ name: schoolName })
+      .select('id')
+      .single()
+
+    if (schoolError || !school) {
+      setError('Account created but school setup failed. Please contact support.')
+      setLoading(false)
+      return
+    }
+
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .insert({ user_id: authData.user.id, school_id: school.id, role: 'teacher' })
+
+    if (profileError) {
+      setError('Account created but profile setup failed. Please contact support.')
       setLoading(false)
       return
     }
