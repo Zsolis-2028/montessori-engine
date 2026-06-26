@@ -87,6 +87,13 @@ export default function LoginPage() {
               {error}
             </p>
           )}
+
+          <p style={{ marginTop: 16, fontSize: 13, color: colors.textMuted, textAlign: 'center' }}>
+            Don&apos;t have an account?{' '}
+            <a href="/signup" style={{ color: colors.navy, fontWeight: 600 }}>
+              Start free trial
+            </a>
+          </p>
         </div>
       </div>
     </div>
