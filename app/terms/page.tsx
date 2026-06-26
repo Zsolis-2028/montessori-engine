@@ -88,8 +88,8 @@ export default function TermsPage() {
 
         <Section title="Contact">
           For questions about these Terms, contact us at{' '}
-          <a href="mailto:support@montessoriengine.com" style={{ color: colors.navy }}>
-            support@montessoriengine.com
+          <a href="mailto:montessoriengine@gmail.com" style={{ color: colors.navy }}>
+            montessoriengine@gmail.com
           </a>.
         </Section>
       </div>

@@ -82,8 +82,8 @@ export default function PrivacyPage() {
 
         <Section title="Contact Us">
           If you have questions about this policy or wish to request data deletion, please email us at{' '}
-          <a href="mailto:privacy@montessoriengine.com" style={{ color: colors.navy }}>
-            privacy@montessoriengine.com
+          <a href="mailto:montessoriengine@gmail.com" style={{ color: colors.navy }}>
+            montessoriengine@gmail.com
           </a>.
         </Section>
       </div>
