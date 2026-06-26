@@ -199,31 +199,6 @@ export default function DashboardPage() {
               classroom records, and future observation notes.
             </p>
 
-            <div
-              style={{
-                marginTop: 18,
-                background: '#fef3c7',
-                border: '1px solid #f59e0b',
-                borderRadius: 10,
-                padding: 14,
-                color: '#92400e',
-              }}
-            >
-              <strong>Demo Tester Note:</strong>
-
-              <p style={{ marginTop: 8, marginBottom: 0 }}>
-                This is an early pilot version. Please use fake/demo student names only.
-                Do not enter private student information yet.
-              </p>
-
-              <ul style={{ marginTop: 10, marginBottom: 0 }}>
-                <li>Generate one activity</li>
-                <li>Save the activity</li>
-                <li>Open My Activities</li>
-                <li>Export the activity as a PDF</li>
-                <li>Send feedback on what was useful, confusing, or missing</li>
-              </ul>
-            </div>
           </div>
         </div>
 
