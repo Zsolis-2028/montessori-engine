@@ -195,8 +195,7 @@ export default function DashboardPage() {
             )}
 
             <p style={{ color: 'var(--color-text-muted)', maxWidth: 650 }}>
-              Teacher tools for Montessori lesson planning, saved activities,
-              classroom records, and future observation notes.
+              AI tools for activity planning, observation notes, and daily planning.
             </p>
 
           </div>
