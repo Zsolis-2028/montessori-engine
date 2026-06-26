@@ -15,9 +15,9 @@ export default function HomePage() {
           <Link href="/login" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none', fontSize: 14, padding: '8px 16px' }}>
             Log In
           </Link>
-          <a href="mailto:zach.solis@icloud.com" style={{ background: colors.gold, color: colors.navy, textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '8px 16px', borderRadius: 6 }}>
-            Request Access
-          </a>
+          <Link href="/signup" style={{ background: colors.gold, color: colors.navy, textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '8px 16px', borderRadius: 6 }}>
+            Start Free Trial
+          </Link>
         </div>
       </header>
 
@@ -30,7 +30,7 @@ export default function HomePage() {
         <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 18, maxWidth: 540, margin: '0 auto 32px', lineHeight: 1.6 }}>
           Generate activities, write observation notes, and plan full days — in seconds. Built specifically for Montessori teachers, not general AI.
         </p>
-        <a href="mailto:zach.solis@icloud.com" style={{
+        <Link href="/signup" style={{
           display: 'inline-block',
           background: colors.gold,
           color: colors.navy,
@@ -40,8 +40,8 @@ export default function HomePage() {
           borderRadius: 8,
           textDecoration: 'none',
         }}>
-          Request Access
-        </a>
+          Start Free Trial
+        </Link>
       </section>
 
       {/* 3 Agents */}
@@ -116,7 +116,7 @@ export default function HomePage() {
         <p style={{ color: '#6b7280', fontSize: 16, marginBottom: 32 }}>
           Join Montessori schools already using AI to work smarter.
         </p>
-        <a href="mailto:zach.solis@icloud.com" style={{
+        <Link href="/signup" style={{
           display: 'inline-block',
           background: colors.navy,
           color: '#fff',
@@ -125,14 +125,19 @@ export default function HomePage() {
           padding: '14px 32px',
           borderRadius: 8,
           textDecoration: 'none',
+          border: `2px solid ${colors.gold}`,
         }}>
-          Request Access
-        </a>
+          Start Free Trial
+        </Link>
       </section>
 
      {/* Footer */}
       <footer style={{ background: colors.navy, padding: '24px', textAlign: 'center' }}>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>© 2026 Montessori Engine. Built for educators who change lives.</p>
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginBottom: 8 }}>© 2026 Montessori Engine. Built for educators who change lives.</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
+          <Link href="/privacy" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, textDecoration: 'none' }}>Privacy Policy</Link>
+          <Link href="/terms" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, textDecoration: 'none' }}>Terms of Service</Link>
+        </div>
       </footer>
 
     </div>

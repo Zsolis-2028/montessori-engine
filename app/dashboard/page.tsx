@@ -9,10 +9,6 @@ import styles from './dashboard.module.css'
 import {
   SparkleIcon,
   BookmarkIcon,
-  PersonIcon,
-  GraduationCapIcon,
-  BuildingIcon,
-  LockIcon,
 } from './icons'
 
 function getInitials(email?: string | null) {
@@ -76,31 +72,6 @@ export default function DashboardPage() {
       description: 'View saved AI-generated lessons and reuse them later.',
       path: '/dashboard/my-activities',
       icon: BookmarkIcon,
-      variant: 'default' as const,
-    },
-    {
-      title: 'Students',
-      description: 'Manage student records and classroom assignments.',
-      path: '/dashboard/students',
-      icon: PersonIcon,
-      variant: 'default' as const,
-    },
-    ...(isAdmin
-      ? [
-          {
-            title: 'Teachers',
-            description: 'Manage teacher records and classroom assignments.',
-            path: '/dashboard/teachers',
-            icon: GraduationCapIcon,
-            variant: 'admin' as const,
-          },
-        ]
-      : []),
-    {
-      title: 'Classrooms',
-      description: 'Manage Montessori classroom groups.',
-      path: '/dashboard/classrooms',
-      icon: BuildingIcon,
       variant: 'default' as const,
     },
   ]
@@ -260,50 +231,22 @@ export default function DashboardPage() {
           {cards.map((card) => {
             const Icon = card.icon
             const isGold = card.variant === 'gold'
-            const isAdminCard = card.variant === 'admin'
-            const ink = isGold ? 'var(--color-navy)' : 'var(--color-navy)'
 
             return (
               <button
                 key={card.title}
                 onClick={() => router.push(card.path)}
                 style={{
-                  position: 'relative',
                   textAlign: 'left',
                   background: isGold ? 'var(--color-gold)' : 'var(--color-card)',
-                  border: isAdminCard
-                    ? '2px solid var(--color-gold)'
-                    : '1px solid var(--color-border)',
+                  border: '1px solid var(--color-border)',
                   borderRadius: 14,
                   padding: 20,
                   cursor: 'pointer',
                   boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
                 }}
               >
-                {isAdminCard && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 12,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      background: '#fdf6e3',
-                      color: 'var(--color-navy)',
-                      border: '1px solid var(--color-gold)',
-                      borderRadius: 999,
-                      padding: '3px 8px',
-                      fontSize: 11,
-                      fontWeight: 600,
-                    }}
-                  >
-                    <LockIcon size={11} />
-                    Admin
-                  </span>
-                )}
-
-                <div style={{ color: ink }}>
+                <div style={{ color: 'var(--color-navy)' }}>
                   <Icon />
                 </div>
 
