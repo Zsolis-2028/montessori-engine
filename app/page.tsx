@@ -82,18 +82,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why not ChatGPT */}
+      {/* Why Montessori Engine */}
       <section style={{ background: colors.navy, padding: '64px 24px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ color: '#fff', fontSize: 28, fontWeight: 700, marginBottom: 16 }}>
-            Why not just use ChatGPT?
+            Why Montessori Engine is Different
           </h2>
           <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 16, lineHeight: 1.7, marginBottom: 32 }}>
-            ChatGPT is a blank canvas. You have to know what to ask and how to ask it. Montessori Engine is built for one job — and everything is already set up for Montessori teachers. No prompting skills needed. Just fill in the form and click generate.
+            General-purpose AI tools are built for everyone — which means they're not built for you. Montessori Engine is purpose-built for Montessori educators. Every workflow, every output, and every feature is designed around how you actually teach.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, textAlign: 'left', maxWidth: 560, margin: '0 auto' }}>
             {[
-              ['ChatGPT', 'Montessori Engine'],
+              ['General AI Tools', 'Montessori Engine'],
               ['Generic responses', 'Montessori-specific output'],
               ['Requires prompting skills', 'Just fill in a form'],
               ['No school context', 'Connected to your school'],
