@@ -37,7 +37,8 @@ Material or Available Items: ${material}
 Include:
 - Activity title
 - Purpose
-- Developmental goal
+- Direct Aim (what the child is directly working on)
+- Indirect Aim (the deeper developmental benefit happening underneath)
 - Step-by-step setup or presentation
 - Safety notes
 - What the teacher should observe
@@ -361,6 +362,23 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
           <div className={styles.markdown}>
             <ReactMarkdown>{output}</ReactMarkdown>
           </div>
+
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
+              (output.match(/^#\s+(.+)/m)?.[1] || material) + " Montessori presentation"
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-block",
+              marginTop: 16,
+              color: "#dc2626",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            🎥 Watch a Montessori presentation
+          </a>
         </>
       )}
       </div>
