@@ -1,9 +1,13 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import OpenAI from "https://deno.land/x/openai@v4.24.0/mod.ts";
 import { logError } from "../_shared/logger.ts";
 
 const FUNCTION_NAME = "observation-writer";
+
+const RATE_LIMIT_MAX_ATTEMPTS = 20;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +21,52 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get("Authorization");
+    const token = authHeader?.replace(/^Bearer\s+/i, "");
+
+    if (!token) {
+      logError(FUNCTION_NAME, "AuthError", "Missing Authorization header");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+
+    if (userError || !userData.user) {
+      logError(FUNCTION_NAME, "AuthError", userError?.message ?? "Invalid token");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const userId = userData.user.id;
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
+
+    const { count: attemptCount, error: rateLimitError } = await supabase
+      .from("observation_writer_rate_limits")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", windowStart);
+
+    if (!rateLimitError && (attemptCount ?? 0) >= RATE_LIMIT_MAX_ATTEMPTS) {
+      logError(FUNCTION_NAME, "RateLimitError", `User ${userId} exceeded observation writer rate limit`);
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    await supabase.from("observation_writer_rate_limits").insert({ user_id: userId });
+
     const { prompt } = await req.json();
 
     if (!prompt) {
