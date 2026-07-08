@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { colors } from "@/lib/theme";
 import { TopBar } from "@/components/TopBar";
+import { sanitizeInput } from "@/lib/sanitize";
 import styles from "../markdown.module.css";
 
 export default function ActivityGenerator() {
@@ -27,12 +28,14 @@ export default function ActivityGenerator() {
     setLoading(true);
     setOutput("");
 
+    const cleanMaterial = sanitizeInput(material).slice(0, 500);
+
     const prompt = `
 Create a Montessori-aligned activity for:
 
 Age Range: ${ageRange}
 Domain: ${domain}
-Material or Available Items: ${material}
+Material or Available Items: ${cleanMaterial}
 
 Include:
 - Activity title
@@ -99,7 +102,7 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
       user_id: user.id,
       school_id: profile.school_id,
       domain,
-      material,
+      material: sanitizeInput(material).slice(0, 500),
       age_range: ageRange,
       generated_activity: output,
     });
@@ -304,6 +307,7 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
           placeholder="Pink Tower, Bead Bars, rice + bowls, soft blocks, etc."
           value={material}
           onChange={(e) => setMaterial(e.target.value)}
+          maxLength={500}
           style={{ padding: 10 }}
         />
 

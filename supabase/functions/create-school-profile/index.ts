@@ -14,23 +14,49 @@ function json(body: unknown, status = 200) {
   });
 }
 
+const RATE_LIMIT_MAX_ATTEMPTS = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function getClientIp(req: Request): string {
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+  return req.headers.get("cf-connecting-ip") ?? "unknown";
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders, status: 200 });
   }
 
   try {
-    const { name, schoolName, email, password } = await req.json();
-
-    if (!name || !schoolName || !email || !password) {
-      return json({ error: "Missing required fields." }, 400);
-    }
-
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
+
+    const ip = getClientIp(req);
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
+
+    const { count: attemptCount, error: rateLimitError } = await supabase
+      .from("signup_rate_limits")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_address", ip)
+      .gte("created_at", windowStart);
+
+    if (!rateLimitError && (attemptCount ?? 0) >= RATE_LIMIT_MAX_ATTEMPTS) {
+      return json({ error: "Too many signup attempts. Please try again later." }, 429);
+    }
+
+    await supabase.from("signup_rate_limits").insert({ ip_address: ip });
+
+    const { name, schoolName, email, password } = await req.json();
+
+    if (!name || !schoolName || !email || !password) {
+      return json({ error: "Missing required fields." }, 400);
+    }
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,

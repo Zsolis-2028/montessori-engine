@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import OpenAI from "https://deno.land/x/openai@v4.24.0/mod.ts";
+import { logError } from "../_shared/logger.ts";
+
+const FUNCTION_NAME = "daily-planner";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,6 +19,7 @@ serve(async (req) => {
     const { prompt } = await req.json();
 
     if (!prompt) {
+      logError(FUNCTION_NAME, "ValidationError", "Missing prompt");
       return new Response(JSON.stringify({ error: "Missing prompt" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -24,6 +28,7 @@ serve(async (req) => {
 
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) {
+      logError(FUNCTION_NAME, "ConfigError", "Missing OPENAI_API_KEY");
       return new Response(JSON.stringify({ error: "Missing OPENAI_API_KEY" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -50,6 +55,11 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
+    logError(
+      FUNCTION_NAME,
+      error instanceof Error ? error.name : "UnknownError",
+      error instanceof Error ? error.message : String(error)
+    );
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { supabase } from "@/lib/supabase/client";
 import { colors } from "@/lib/theme";
 import { TopBar } from "@/components/TopBar";
+import { sanitizeInput } from "@/lib/sanitize";
 import styles from "../markdown.module.css";
 
 export default function DailyPlanner() {
@@ -24,13 +25,17 @@ export default function DailyPlanner() {
     setLoading(true);
     setOutput("");
 
+    const cleanChildCount = sanitizeInput(childCount);
+    const cleanTheme = sanitizeInput(theme).slice(0, 300);
+    const cleanNotes = sanitizeInput(notes).slice(0, 3000);
+
     const prompt = `
 Create a full Montessori daily activity plan for:
 
 Room Type: ${roomType}
-Number of Children: ${childCount || "Not specified"}
-Theme or Focus: ${theme || "None"}
-Additional Notes: ${notes || "None"}
+Number of Children: ${cleanChildCount || "Not specified"}
+Theme or Focus: ${cleanTheme || "None"}
+Additional Notes: ${cleanNotes || "None"}
 
 Structure the day as follows:
 
@@ -119,6 +124,7 @@ Safety note: All activities must be safe for ${roomType} — no choking hazards 
             placeholder="e.g. Nature, colours, farm animals, water play..."
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
+            maxLength={300}
             style={{ padding: 10, borderRadius: 6, border: "1px solid #d1d5db" }}
           />
 
@@ -128,6 +134,7 @@ Safety note: All activities must be safe for ${roomType} — no choking hazards 
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
+            maxLength={3000}
             style={{ padding: 10, borderRadius: 6, border: "1px solid #d1d5db", resize: "vertical" }}
           />
 

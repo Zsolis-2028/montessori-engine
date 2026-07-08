@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { colors } from '@/lib/theme'
 import { TopBar } from '@/components/TopBar'
+import { sanitizeInput } from '@/lib/sanitize'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -21,7 +22,12 @@ export default function SignupPage() {
     setError('')
 
     const { data, error: fnError } = await supabase.functions.invoke('create-school-profile', {
-      body: { name, schoolName, email, password },
+      body: {
+        name: sanitizeInput(name).slice(0, 150),
+        schoolName: sanitizeInput(schoolName).slice(0, 150),
+        email,
+        password,
+      },
     })
 
     if (fnError || !data?.success) {
@@ -71,6 +77,7 @@ export default function SignupPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              maxLength={150}
               style={{ padding: 10, border: `1px solid ${colors.border}`, borderRadius: 4 }}
             />
 
@@ -81,6 +88,7 @@ export default function SignupPage() {
               value={schoolName}
               onChange={(e) => setSchoolName(e.target.value)}
               required
+              maxLength={150}
               style={{ padding: 10, border: `1px solid ${colors.border}`, borderRadius: 4 }}
             />
 

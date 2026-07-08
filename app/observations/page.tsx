@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { colors } from "@/lib/theme";
 import { TopBar } from "@/components/TopBar";
+import { sanitizeInput } from "@/lib/sanitize";
 import styles from "../markdown.module.css";
 
 export default function ObservationWriter() {
@@ -25,18 +26,21 @@ export default function ObservationWriter() {
     setLoading(true);
     setOutput("");
 
+    const cleanChildAge = sanitizeInput(childAge).slice(0, 50);
+    const cleanRawNote = sanitizeInput(rawNote).slice(0, 5000);
+
     const prompt = `
 Transform this raw teacher observation into a professional Montessori observation note:
 
-Child Age: ${childAge || "Not specified"}
+Child Age: ${cleanChildAge || "Not specified"}
 Setting: ${setting || "Not specified"}
-Raw observation: ${rawNote}
+Raw observation: ${cleanRawNote}
 
 Format the output as:
 ## Observation Note
 
 **Date:** [leave blank for teacher to fill]
-**Child Age:** ${childAge || "[fill in]"}
+**Child Age:** ${cleanChildAge || "[fill in]"}
 **Setting:** ${setting || "[fill in]"}
 
 **Observation:**
@@ -84,6 +88,7 @@ Format the output as:
             placeholder="e.g. 3 years 4 months"
             value={childAge}
             onChange={(e) => setChildAge(e.target.value)}
+            maxLength={50}
             style={{ padding: 10, borderRadius: 6, border: "1px solid #d1d5db" }}
           />
 
@@ -108,6 +113,7 @@ Format the output as:
             value={rawNote}
             onChange={(e) => setRawNote(e.target.value)}
             rows={6}
+            maxLength={5000}
             style={{ padding: 10, borderRadius: 6, border: "1px solid #d1d5db", resize: "vertical" }}
           />
 
