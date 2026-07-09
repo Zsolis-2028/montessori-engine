@@ -57,6 +57,16 @@ export default function PrivacyPage() {
           without appropriate safeguards in place.
         </Section>
 
+        <Section title="Security Measures">
+          <p>We employ multiple layers of security to protect your data:</p>
+          <ul>
+            <li><strong>Input sanitization</strong> — all user-submitted content is validated and sanitized to prevent injection attacks.</li>
+            <li><strong>Rate limiting</strong> — per-user rate limits are enforced on API requests and AI-generation features to prevent abuse and ensure fair access.</li>
+            <li><strong>JWT authentication</strong> — access to platform functions requires a valid, signed JSON Web Token verifying your identity on every request.</li>
+            <li><strong>Row level security</strong> — database-enforced policies ensure users and schools can only access data they are authorized to see, scoped at the database layer rather than relying solely on application logic.</li>
+          </ul>
+        </Section>
+
         <Section title="We Never Sell Your Data">
           We do not sell, rent, trade, or otherwise transfer your personal information or your
           students' information to any third party for commercial purposes. Ever. Your data is yours.

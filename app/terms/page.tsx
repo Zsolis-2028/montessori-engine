@@ -63,7 +63,17 @@ export default function TermsPage() {
             <li>Attempt to gain unauthorized access to any part of the Service or its infrastructure.</li>
             <li>Resell or sublicense access to the Service without written permission.</li>
             <li>Use the Service in a way that violates FERPA or other applicable education privacy laws.</li>
+            <li>Attempt to circumvent, disable, or exceed rate limits or other technical restrictions put in place to prevent abuse.</li>
+            <li>Use automated means (bots, scripts, scrapers) to interact with the Service outside of its documented APIs.</li>
+            <li>Interfere with or disrupt the integrity or performance of the Service or the data it contains.</li>
           </ul>
+          <p>
+            Repeated rate limit violations or other abusive activity may result in temporary throttling,
+            suspension, or permanent termination of your account, at our discretion and without prior
+            notice where necessary to protect the Service or other users. We will make reasonable efforts
+            to notify you of enforcement action taken against your account except where doing so would
+            undermine our ability to prevent abuse.
+          </p>
         </Section>
 
         <Section title="Service Availability">
