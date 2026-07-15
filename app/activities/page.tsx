@@ -8,10 +8,12 @@ import { supabase } from "@/lib/supabase/client";
 import { colors } from "@/lib/theme";
 import { TopBar } from "@/components/TopBar";
 import { sanitizeInput } from "@/lib/sanitize";
+import { useRequireAuth } from "@/lib/useRequireAuth";
 import styles from "../markdown.module.css";
 
 export default function ActivityGenerator() {
   const router = useRouter();
+  const authReady = useRequireAuth();
 
   const [ageRange, setAgeRange] = useState("");
   const [domain, setDomain] = useState("");
@@ -224,6 +226,15 @@ If the age range is 3-6 or 6-9, include Montessori presentation language, contro
     `);
 
     printWindow.document.close();
+  }
+
+  if (!authReady) {
+    return (
+      <div style={{ minHeight: "100vh", background: colors.bg }}>
+        <TopBar />
+        <p style={{ padding: 24, fontFamily: "Arial, sans-serif" }}>Loading…</p>
+      </div>
+    );
   }
 
   return (

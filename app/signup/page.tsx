@@ -5,7 +5,13 @@ import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { colors } from '@/lib/theme'
 import { TopBar } from '@/components/TopBar'
+import { Turnstile } from '@/components/Turnstile'
 import { sanitizeInput } from '@/lib/sanitize'
+
+// Public site key. When unset (e.g. before you've configured Turnstile),
+// the CAPTCHA is skipped so signup keeps working; it activates automatically
+// once this env var and the matching secret in Supabase are set.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 export default function SignupPage() {
   const router = useRouter()
@@ -15,9 +21,24 @@ export default function SignupPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState('')
+  const [captchaKey, setCaptchaKey] = useState(0)
+
+  const captchaEnabled = Boolean(TURNSTILE_SITE_KEY)
+
+  function resetCaptcha() {
+    setCaptchaToken('')
+    setCaptchaKey((k) => k + 1)
+  }
 
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
+    if (captchaEnabled && !captchaToken) {
+      setError('Please complete the verification below.')
+      return
+    }
+
     setLoading(true)
     setError('')
 
@@ -27,12 +48,14 @@ export default function SignupPage() {
         schoolName: sanitizeInput(schoolName).slice(0, 150),
         email,
         password,
+        captchaToken: captchaToken || undefined,
       },
     })
 
     if (fnError || !data?.success) {
       setError(data?.error ?? fnError?.message ?? 'Signup failed. Please try again.')
       setLoading(false)
+      if (captchaEnabled) resetCaptcha()
       return
     }
 
@@ -112,19 +135,30 @@ export default function SignupPage() {
               style={{ padding: 10, border: `1px solid ${colors.border}`, borderRadius: 4 }}
             />
 
+            {captchaEnabled && TURNSTILE_SITE_KEY && (
+              <Turnstile
+                key={captchaKey}
+                siteKey={TURNSTILE_SITE_KEY}
+                onToken={setCaptchaToken}
+              />
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (captchaEnabled && !captchaToken)}
               style={{
                 padding: 10,
                 background: colors.gold,
                 color: colors.navy,
                 border: 'none',
                 borderRadius: 4,
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor:
+                  loading || (captchaEnabled && !captchaToken)
+                    ? 'not-allowed'
+                    : 'pointer',
                 marginTop: 10,
                 fontWeight: 600,
-                opacity: loading ? 0.7 : 1,
+                opacity: loading || (captchaEnabled && !captchaToken) ? 0.7 : 1,
               }}
             >
               {loading ? 'Creating account...' : 'Create Account'}

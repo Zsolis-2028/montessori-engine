@@ -7,10 +7,12 @@ import { supabase } from "@/lib/supabase/client";
 import { colors } from "@/lib/theme";
 import { TopBar } from "@/components/TopBar";
 import { sanitizeInput } from "@/lib/sanitize";
+import { useRequireAuth } from "@/lib/useRequireAuth";
 import styles from "../markdown.module.css";
 
 export default function ObservationWriter() {
   const router = useRouter();
+  const authReady = useRequireAuth();
   const [childAge, setChildAge] = useState("");
   const [setting, setSetting] = useState("");
   const [rawNote, setRawNote] = useState("");
@@ -71,6 +73,15 @@ Format the output as:
     navigator.clipboard.writeText(output);
     alert("Copied to clipboard!");
   };
+
+  if (!authReady) {
+    return (
+      <div style={{ minHeight: "100vh", background: colors.bg }}>
+        <TopBar />
+        <p style={{ padding: 24, fontFamily: "Arial, sans-serif" }}>Loading…</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: colors.bg }}>

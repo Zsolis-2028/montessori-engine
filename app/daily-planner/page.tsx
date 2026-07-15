@@ -6,9 +6,11 @@ import { supabase } from "@/lib/supabase/client";
 import { colors } from "@/lib/theme";
 import { TopBar } from "@/components/TopBar";
 import { sanitizeInput } from "@/lib/sanitize";
+import { useRequireAuth } from "@/lib/useRequireAuth";
 import styles from "../markdown.module.css";
 
 export default function DailyPlanner() {
+  const authReady = useRequireAuth();
   const [roomType, setRoomType] = useState("");
   const [childCount, setChildCount] = useState("");
   const [theme, setTheme] = useState("");
@@ -82,6 +84,15 @@ Safety note: All activities must be safe for ${roomType} — no choking hazards 
     navigator.clipboard.writeText(output);
     alert("Copied to clipboard!");
   };
+
+  if (!authReady) {
+    return (
+      <div style={{ minHeight: "100vh", background: colors.bg }}>
+        <TopBar />
+        <p style={{ padding: 24, fontFamily: "Arial, sans-serif" }}>Loading…</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: colors.bg }}>

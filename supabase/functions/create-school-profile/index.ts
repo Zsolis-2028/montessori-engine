@@ -25,6 +25,34 @@ function getClientIp(req: Request): string {
   return req.headers.get("cf-connecting-ip") ?? "unknown";
 }
 
+// Verify a Cloudflare Turnstile token. Returns true if valid.
+// If TURNSTILE_SECRET_KEY is not configured, CAPTCHA is treated as disabled
+// (returns true) so signup keeps working until you finish setup.
+async function verifyCaptcha(
+  token: string | undefined,
+  ip: string,
+): Promise<boolean> {
+  const secret = Deno.env.get("TURNSTILE_SECRET_KEY");
+  if (!secret) return true; // CAPTCHA not configured yet — skip.
+  if (!token) return false;
+
+  try {
+    const form = new URLSearchParams();
+    form.append("secret", secret);
+    form.append("response", token);
+    if (ip && ip !== "unknown") form.append("remoteip", ip);
+
+    const res = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      { method: "POST", body: form },
+    );
+    const data = await res.json();
+    return data?.success === true;
+  } catch {
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders, status: 200 });
@@ -52,10 +80,15 @@ serve(async (req) => {
 
     await supabase.from("signup_rate_limits").insert({ ip_address: ip });
 
-    const { name, schoolName, email, password } = await req.json();
+    const { name, schoolName, email, password, captchaToken } = await req.json();
 
     if (!name || !schoolName || !email || !password) {
       return json({ error: "Missing required fields." }, 400);
+    }
+
+    const captchaOk = await verifyCaptcha(captchaToken, ip);
+    if (!captchaOk) {
+      return json({ error: "Verification failed. Please try again." }, 400);
     }
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
