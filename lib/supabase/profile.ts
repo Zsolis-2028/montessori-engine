@@ -2,6 +2,8 @@ import { supabase } from './client'
 
 export type UserRole = 'school_admin' | 'teacher'
 
+export type SchoolPlan = 'trial' | 'school' | 'district'
+
 export type SchoolProfileResult =
   | {
       status: 'ok'
@@ -9,6 +11,7 @@ export type SchoolProfileResult =
       schoolId: string
       role: UserRole
       schoolName: string | null
+      plan: SchoolPlan
     }
   | { status: 'unauthenticated' }
   | { status: 'missing-profile' }
@@ -24,7 +27,7 @@ export async function getCurrentSchoolProfile(): Promise<SchoolProfileResult> {
 
   const { data: profile, error } = await supabase
     .from('user_profiles')
-    .select('school_id, role, schools(name)')
+    .select('school_id, role, schools(name, plan)')
     .eq('user_id', user.id)
     .single()
 
@@ -32,7 +35,14 @@ export async function getCurrentSchoolProfile(): Promise<SchoolProfileResult> {
     return { status: 'missing-profile' }
   }
 
-  const school = profile.schools as unknown as { name: string } | null
+  const school = profile.schools as unknown as {
+    name: string
+    plan: string | null
+  } | null
+
+  const rawPlan = school?.plan ?? 'trial'
+  const plan: SchoolPlan =
+    rawPlan === 'school' || rawPlan === 'district' ? rawPlan : 'trial'
 
   return {
     status: 'ok',
@@ -40,5 +50,6 @@ export async function getCurrentSchoolProfile(): Promise<SchoolProfileResult> {
     schoolId: profile.school_id,
     role: profile.role as UserRole,
     schoolName: school?.name ?? null,
+    plan,
   }
 }

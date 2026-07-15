@@ -54,6 +54,24 @@ export function BuildingIcon({ size = 22 }: IconProps) {
   )
 }
 
+export function ProgressIcon({ size = 22 }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+      <path d="M4 20V4M4 20h16" />
+      <path d="M8 20v-6M12 20v-9M16 20v-4M20 20V8" />
+    </svg>
+  )
+}
+
+export function ReportIcon({ size = 22 }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M14 3v4h4M9 12h6M9 16h6" />
+    </svg>
+  )
+}
+
 export function LockIcon({ size = 12 }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} {...base}>

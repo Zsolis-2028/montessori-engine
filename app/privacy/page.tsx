@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       <div style={{ maxWidth: 720, margin: '50px auto', padding: '0 24px 80px' }}>
         <h1 style={{ color: colors.navy, marginBottom: 4 }}>Privacy Policy</h1>
         <p style={{ color: colors.textMuted, fontSize: 14, marginTop: 0, marginBottom: 40 }}>
-          Effective date: June 26, 2026
+          Effective date: July 14, 2026
         </p>
 
         <Section title="Overview">
@@ -24,6 +24,7 @@ export default function PrivacyPage() {
             <li><strong>Account information</strong> — your name, school name, and email address provided at signup.</li>
             <li><strong>Authentication credentials</strong> — passwords are hashed and never stored in plain text.</li>
             <li><strong>Educational content</strong> — activities, observations, lesson plans, and student records you create within the platform.</li>
+            <li><strong>Student progress records</strong> — a student&rsquo;s progress on individual Montessori materials (marked as Introduced, Practicing, or Mastered) and the developmental summaries generated from it, recorded over time by their teacher.</li>
             <li><strong>Usage data</strong> — page visits and feature interactions used to improve the product. This data is not linked to individual student records.</li>
           </ul>
         </Section>

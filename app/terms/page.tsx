@@ -9,7 +9,7 @@ export default function TermsPage() {
       <div style={{ maxWidth: 720, margin: '50px auto', padding: '0 24px 80px' }}>
         <h1 style={{ color: colors.navy, marginBottom: 4 }}>Terms of Service</h1>
         <p style={{ color: colors.textMuted, fontSize: 14, marginTop: 0, marginBottom: 40 }}>
-          Effective date: June 26, 2026
+          Effective date: July 14, 2026
         </p>
 
         <Section title="Acceptance of Terms">
@@ -20,17 +20,24 @@ export default function TermsPage() {
         </Section>
 
         <Section title="Free Trial">
-          New accounts receive a <strong>30-day free trial</strong> with full access to all features.
-          No credit card is required to start your trial. At the end of the trial period, your account
-          will be paused unless you add a payment method and subscribe. Your data is preserved during
-          a paused account for 30 days.
+          New accounts receive a <strong>30-day free trial</strong> with full access to Montessori
+          Engine&rsquo;s core teaching tools — the activity generator, observation writer, daily
+          planner, and student records. Student progress tracking and development reports are included
+          with the School and District plans. No credit card is required to start your trial. At the
+          end of the trial period, your account will be paused unless you add a payment method and
+          subscribe. Your data is preserved during a paused account for 30 days.
         </Section>
 
         <Section title="Subscription and Pricing">
-          After the free trial, the Service is billed at <strong>$200 per month</strong> per school.
-          This flat rate covers unlimited teachers and classrooms within a single school location.
-          Billing is charged monthly to the payment method on file. All prices are in USD. We reserve
-          the right to change pricing with 60 days' written notice to active subscribers.
+          <p>After the free trial, the Service is offered on the following plans:</p>
+          <ul>
+            <li><strong>School plan — $200 per month per school.</strong> Covers a single school location with unlimited teachers and classrooms, including student progress tracking and development reports.</li>
+            <li><strong>District plan — custom pricing.</strong> For organizations operating multiple school locations under one administration, with district-wide reporting. Contact us for a quote.</li>
+          </ul>
+          <p>
+            Billing is charged monthly to the payment method on file. All prices are in USD. We reserve
+            the right to change pricing with 60 days&rsquo; written notice to active subscribers.
+          </p>
         </Section>
 
         <Section title="Payment">

@@ -4,11 +4,18 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
-import { getCurrentSchoolProfile, type UserRole } from '@/lib/supabase/profile'
+import {
+  getCurrentSchoolProfile,
+  type UserRole,
+  type SchoolPlan,
+} from '@/lib/supabase/profile'
 import styles from './dashboard.module.css'
 import {
   SparkleIcon,
   BookmarkIcon,
+  ProgressIcon,
+  ReportIcon,
+  LockIcon,
 } from './icons'
 
 function getInitials(email?: string | null) {
@@ -21,6 +28,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [role, setRole] = useState<UserRole | null>(null)
   const [schoolName, setSchoolName] = useState<string | null>(null)
+  const [plan, setPlan] = useState<SchoolPlan>('trial')
   const [loading, setLoading] = useState(true)
   const [profileError, setProfileError] = useState('')
 
@@ -44,6 +52,7 @@ export default function DashboardPage() {
       } else if (profile.status === 'ok') {
         setRole(profile.role)
         setSchoolName(profile.schoolName)
+        setPlan(profile.plan)
       }
 
       setLoading(false)
@@ -59,20 +68,51 @@ export default function DashboardPage() {
     router.push('/login')
   }
 
-  const cards = [
+  const hasSchoolPlan = plan === 'school' || plan === 'district'
+
+  type DashboardCard = {
+    title: string
+    description: string
+    path: string
+    icon: typeof SparkleIcon
+    variant: 'gold' | 'default'
+    locked?: boolean
+  }
+
+  const cards: DashboardCard[] = [
     {
       title: 'Generate Activity',
       description: 'Create a Montessori lesson idea using age, domain, and material.',
       path: '/activities',
       icon: SparkleIcon,
-      variant: 'gold' as const,
+      variant: 'gold',
     },
     {
       title: 'My Activities',
       description: 'View saved AI-generated lessons and reuse them later.',
       path: '/dashboard/my-activities',
       icon: BookmarkIcon,
-      variant: 'default' as const,
+      variant: 'default',
+    },
+    {
+      title: 'Progress Tracking',
+      description: hasSchoolPlan
+        ? 'Track each student across Practical Life, Sensorial, Math, Language, and Cultural.'
+        : 'Track student mastery across every Montessori area.',
+      path: '/dashboard/progress',
+      icon: ProgressIcon,
+      variant: 'default',
+      locked: !hasSchoolPlan,
+    },
+    {
+      title: 'Reports',
+      description: hasSchoolPlan
+        ? 'School-wide development tracking and recent activity across all students.'
+        : 'School-wide development reports for all your students.',
+      path: '/dashboard/reports',
+      icon: ReportIcon,
+      variant: 'default',
+      locked: !hasSchoolPlan,
     },
   ]
 
@@ -205,6 +245,97 @@ export default function DashboardPage() {
           {cards.map((card) => {
             const Icon = card.icon
             const isGold = card.variant === 'gold'
+
+            if (card.locked) {
+              return (
+                <div
+                  key={card.title}
+                  style={{
+                    position: 'relative',
+                    textAlign: 'left',
+                    background: 'var(--color-card)',
+                    border: '1px solid var(--color-gold)',
+                    borderRadius: 14,
+                    padding: 20,
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: 14,
+                      right: 14,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      background: 'var(--color-gold)',
+                      color: 'var(--color-navy)',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: '4px 10px',
+                      borderRadius: 999,
+                    }}
+                  >
+                    <LockIcon /> School plan
+                  </span>
+
+                  <div style={{ color: 'var(--color-navy)' }}>
+                    <Icon />
+                  </div>
+
+                  <h2
+                    style={{
+                      margin: '10px 0 0',
+                      fontSize: 20,
+                      color: 'var(--color-navy)',
+                    }}
+                  >
+                    {card.title}
+                  </h2>
+
+                  <p
+                    style={{
+                      color: 'var(--color-text-muted)',
+                      marginTop: 8,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {card.description}
+                  </p>
+
+                  <div
+                    style={{
+                      marginTop: 14,
+                      padding: '10px 12px',
+                      background: 'var(--color-navy)',
+                      borderRadius: 10,
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: 0,
+                        color: 'var(--color-gold)',
+                        fontSize: 13,
+                        fontWeight: 700,
+                      }}
+                    >
+                      Included with the School plan
+                    </p>
+                    <p
+                      style={{
+                        margin: '4px 0 0',
+                        color: '#cbd5e1',
+                        fontSize: 12,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      See every student&rsquo;s progress across all five
+                      Montessori areas. Contact us to unlock it for your school.
+                    </p>
+                  </div>
+                </div>
+              )
+            }
 
             return (
               <button

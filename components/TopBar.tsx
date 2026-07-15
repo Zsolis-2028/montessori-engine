@@ -13,6 +13,8 @@ export function TopBar() {
     { label: 'Observations', href: '/observations' },
     { label: 'Daily Planner', href: '/daily-planner' },
     { label: 'My Activities', href: '/dashboard/my-activities' },
+    { label: 'Progress', href: '/dashboard/progress' },
+    { label: 'Reports', href: '/dashboard/reports' },
     { label: 'Dashboard', href: '/dashboard' },
   ]
 
