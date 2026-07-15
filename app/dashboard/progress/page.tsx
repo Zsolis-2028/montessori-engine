@@ -39,11 +39,11 @@ export default function ProgressPage() {
 
   const [students, setStudents] = useState<Student[]>([])
   const [selectedStudent, setSelectedStudent] = useState<string>('')
-  const [selectedArea, setSelectedArea] = useState<MontessoriArea>(
-    MONTESSORI_AREAS[0]
-  )
   const [rows, setRows] = useState<ProgressRow[]>([])
   const [savingKey, setSavingKey] = useState<string | null>(null)
+  const [openAreas, setOpenAreas] = useState<Record<string, boolean>>({
+    [MONTESSORI_AREAS[0]]: true,
+  })
 
   const reloadProgress = useCallback(async (studentId: string) => {
     if (!studentId) {
@@ -112,12 +112,32 @@ export default function ProgressPage() {
     return map
   }, [rows])
 
-  async function setStatus(material: string, status: ProgressStatus) {
+  // Per-area tallies for the collapsed header badges.
+  const areaCounts = useMemo(() => {
+    const map: Record<
+      string,
+      { introduced: number; practicing: number; mastered: number; total: number }
+    > = {}
+    for (const area of MONTESSORI_AREAS) {
+      map[area] = { introduced: 0, practicing: 0, mastered: 0, total: 0 }
+    }
+    for (const row of rows) {
+      if (!map[row.area]) continue
+      map[row.area][row.status] += 1
+      map[row.area].total += 1
+    }
+    return map
+  }, [rows])
+
+  async function setStatus(
+    area: MontessoriArea,
+    material: string,
+    status: ProgressStatus
+  ) {
     if (!selectedStudent || !schoolId) return
 
-    const key = `${selectedArea}::${material}`
+    const key = `${area}::${material}`
     setSavingKey(key)
-
     const current = statusByMaterial[key]
 
     // Clicking the already-active status clears it.
@@ -126,7 +146,7 @@ export default function ProgressPage() {
         .from('student_progress')
         .delete()
         .eq('student_id', selectedStudent)
-        .eq('area', selectedArea)
+        .eq('area', area)
         .eq('material', material)
 
       if (error) {
@@ -143,7 +163,7 @@ export default function ProgressPage() {
       {
         school_id: schoolId,
         student_id: selectedStudent,
-        area: selectedArea,
+        area,
         material,
         status,
         updated_by: userId,
@@ -160,23 +180,12 @@ export default function ProgressPage() {
     setSavingKey(null)
   }
 
+  function toggleArea(area: string) {
+    setOpenAreas((prev) => ({ ...prev, [area]: !prev[area] }))
+  }
+
   const selectedStudentName =
     students.find((s) => s.id === selectedStudent)?.name ?? ''
-
-  // Summary counts across all areas for the selected student.
-  const summary = useMemo(() => {
-    const byArea: Record<
-      string,
-      { introduced: number; practicing: number; mastered: number }
-    > = {}
-    for (const row of rows) {
-      if (!byArea[row.area]) {
-        byArea[row.area] = { introduced: 0, practicing: 0, mastered: 0 }
-      }
-      byArea[row.area][row.status] += 1
-    }
-    return byArea
-  }, [rows])
 
   if (loading) {
     return (
@@ -196,8 +205,6 @@ export default function ProgressPage() {
     )
   }
 
-  const materials = MATERIALS_BY_AREA[selectedArea]
-
   return (
     <div style={{ minHeight: '100vh', background: colors.bg }}>
       <TopBar />
@@ -212,186 +219,193 @@ export default function ProgressPage() {
         <div style={cardStyle}>
           <h1 style={{ margin: 0, color: colors.navy }}>Progress Tracking</h1>
           <p style={{ color: '#64748b', marginTop: 8 }}>
-            Select a student and Montessori area, then mark each material as
+            Pick a student, then open a Montessori area and mark each material as
             Introduced, Practicing, or Mastered.
           </p>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 12,
-              marginTop: 8,
-            }}
+          <label style={labelStyle}>Student</label>
+          <select
+            value={selectedStudent}
+            onChange={(e) => setSelectedStudent(e.target.value)}
+            style={inputStyle}
           >
-            <div>
-              <label style={labelStyle}>Student</label>
-              <select
-                value={selectedStudent}
-                onChange={(e) => setSelectedStudent(e.target.value)}
-                style={inputStyle}
-              >
-                <option value="">Select a student</option>
-                {students.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name || 'Unnamed Student'}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={labelStyle}>Montessori Area</label>
-              <select
-                value={selectedArea}
-                onChange={(e) =>
-                  setSelectedArea(e.target.value as MontessoriArea)
-                }
-                style={inputStyle}
-              >
-                {MONTESSORI_AREAS.map((area) => (
-                  <option key={area} value={area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+            <option value="">Select a student</option>
+            {students.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name || 'Unnamed Student'}
+              </option>
+            ))}
+          </select>
         </div>
 
         {students.length === 0 && (
           <div style={cardStyle}>
             <p style={{ margin: 0 }}>
-              No students yet. Add students first on the Students page, then come
-              back to track their progress.
+              No students yet. Add students first on the Students page (under
+              Manage), then come back to track their progress.
             </p>
           </div>
         )}
 
         {selectedStudent && (
-          <div style={cardStyle}>
-            <h2 style={{ marginTop: 0, color: colors.navy }}>
-              {selectedArea}
-              <span style={{ color: '#94a3b8', fontWeight: 400 }}>
-                {' '}
-                &middot; {selectedStudentName}
-              </span>
-            </h2>
-
-            <div style={{ display: 'grid', gap: 10 }}>
-              {materials.map((material) => {
-                const key = `${selectedArea}::${material}`
-                const current = statusByMaterial[key]
-                const saving = savingKey === key
-                return (
-                  <div
-                    key={material}
+          <div style={{ display: 'grid', gap: 12 }}>
+            {MONTESSORI_AREAS.map((area) => {
+              const isOpen = !!openAreas[area]
+              const counts = areaCounts[area]
+              const materials = MATERIALS_BY_AREA[area]
+              return (
+                <div key={area} style={{ ...cardStyle, marginBottom: 0, padding: 0 }}>
+                  <button
+                    onClick={() => toggleArea(area)}
                     style={{
+                      width: '100%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       gap: 12,
-                      padding: '10px 12px',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: 10,
-                      background: current ? '#f8fafc' : 'white',
-                      flexWrap: 'wrap',
-                      opacity: saving ? 0.6 : 1,
+                      padding: '18px 20px',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
                     }}
                   >
-                    <span style={{ color: colors.navy, fontWeight: 500 }}>
-                      {material}
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        color: colors.navy,
+                        fontSize: 18,
+                        fontWeight: 700,
+                      }}
+                    >
+                      <span style={{ fontSize: 12, color: '#94a3b8' }}>
+                        {isOpen ? '▼' : '▶'}
+                      </span>
+                      {area}
                     </span>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      {STATUS_ORDER.map((status) => {
-                        const active = current === status
+                    <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      {counts.total === 0 ? (
+                        <span style={{ color: '#cbd5e1', fontSize: 13 }}>
+                          Not started
+                        </span>
+                      ) : (
+                        <>
+                          {counts.practicing > 0 && (
+                            <Pill
+                              color={STATUS_COLORS.practicing}
+                              label={`${counts.practicing} Practicing`}
+                              dark
+                            />
+                          )}
+                          {counts.mastered > 0 && (
+                            <Pill
+                              color={STATUS_COLORS.mastered}
+                              label={`${counts.mastered} Mastered`}
+                            />
+                          )}
+                          {counts.introduced > 0 && (
+                            <Pill
+                              color={STATUS_COLORS.introduced}
+                              label={`${counts.introduced} Introduced`}
+                            />
+                          )}
+                        </>
+                      )}
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div
+                      style={{
+                        padding: '0 20px 18px',
+                        display: 'grid',
+                        gap: 10,
+                      }}
+                    >
+                      {materials.map((material) => {
+                        const key = `${area}::${material}`
+                        const current = statusByMaterial[key]
+                        const saving = savingKey === key
                         return (
-                          <button
-                            key={status}
-                            onClick={() => setStatus(material, status)}
-                            disabled={saving}
-                            title={
-                              active
-                                ? 'Click again to clear'
-                                : STATUS_LABELS[status]
-                            }
+                          <div
+                            key={material}
                             style={{
-                              padding: '6px 12px',
-                              borderRadius: 999,
-                              border: active
-                                ? `2px solid ${STATUS_COLORS[status]}`
-                                : '1px solid #cbd5e1',
-                              background: active
-                                ? STATUS_COLORS[status]
-                                : 'white',
-                              color: active
-                                ? status === 'practicing'
-                                  ? colors.navy
-                                  : 'white'
-                                : '#475569',
-                              cursor: saving ? 'default' : 'pointer',
-                              fontSize: 13,
-                              fontWeight: active ? 700 : 500,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: 12,
+                              padding: '10px 12px',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: 10,
+                              background: current ? '#f8fafc' : 'white',
+                              flexWrap: 'wrap',
+                              opacity: saving ? 0.6 : 1,
                             }}
                           >
-                            {STATUS_LABELS[status]}
-                          </button>
+                            <span style={{ color: colors.navy, fontWeight: 500 }}>
+                              {material}
+                            </span>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              {STATUS_ORDER.map((status) => {
+                                const active = current === status
+                                return (
+                                  <button
+                                    key={status}
+                                    onClick={() =>
+                                      setStatus(area, material, status)
+                                    }
+                                    disabled={saving}
+                                    title={
+                                      active
+                                        ? 'Click again to clear'
+                                        : STATUS_LABELS[status]
+                                    }
+                                    style={{
+                                      padding: '6px 12px',
+                                      borderRadius: 999,
+                                      border: active
+                                        ? `2px solid ${STATUS_COLORS[status]}`
+                                        : '1px solid #cbd5e1',
+                                      background: active
+                                        ? STATUS_COLORS[status]
+                                        : 'white',
+                                      color: active
+                                        ? status === 'practicing'
+                                          ? colors.navy
+                                          : 'white'
+                                        : '#475569',
+                                      cursor: saving ? 'default' : 'pointer',
+                                      fontSize: 13,
+                                      fontWeight: active ? 700 : 500,
+                                    }}
+                                  >
+                                    {STATUS_LABELS[status]}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
                         )
                       })}
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
+                  )}
+                </div>
+              )
+            })}
 
-        {selectedStudent && rows.length > 0 && (
-          <div style={cardStyle}>
-            <h2 style={{ marginTop: 0, color: colors.navy }}>
-              Summary for {selectedStudentName}
-            </h2>
-            <div style={{ display: 'grid', gap: 10 }}>
-              {MONTESSORI_AREAS.filter((a) => summary[a]).map((area) => {
-                const s = summary[area]
-                const total = s.introduced + s.practicing + s.mastered
-                return (
-                  <div
-                    key={area}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: 12,
-                      padding: '10px 12px',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <strong style={{ color: colors.navy }}>{area}</strong>
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      <Pill
-                        color={STATUS_COLORS.introduced}
-                        label={`${s.introduced} Introduced`}
-                      />
-                      <Pill
-                        color={STATUS_COLORS.practicing}
-                        label={`${s.practicing} Practicing`}
-                        dark
-                      />
-                      <Pill
-                        color={STATUS_COLORS.mastered}
-                        label={`${s.mastered} Mastered`}
-                      />
-                      <span style={{ color: '#94a3b8', fontSize: 13 }}>
-                        {total} tracked
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <p
+              style={{
+                color: '#94a3b8',
+                fontSize: 13,
+                textAlign: 'center',
+                margin: '4px 0 0',
+              }}
+            >
+              Tracking for {selectedStudentName}. Tap an active status again to
+              clear it.
+            </p>
           </div>
         )}
       </div>
@@ -437,7 +451,7 @@ const labelStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 600,
   color: '#475569',
-  marginBottom: 6,
+  margin: '4px 0 6px',
 }
 
 const inputStyle: React.CSSProperties = {

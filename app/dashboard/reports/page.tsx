@@ -33,6 +33,7 @@ export default function ReportsPage() {
   const [profileError, setProfileError] = useState('')
   const [students, setStudents] = useState<Student[]>([])
   const [rows, setRows] = useState<ProgressRow[]>([])
+  const [openStudents, setOpenStudents] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     async function loadData() {
@@ -87,7 +88,6 @@ export default function ReportsPage() {
     return map
   }, [students])
 
-  // Per-student rollup: status counts + areas worked in.
   const perStudent = useMemo(() => {
     const map: Record<
       string,
@@ -118,8 +118,11 @@ export default function ReportsPage() {
     return map
   }, [students, rows])
 
-  const recent = rows.slice(0, 12)
+  function toggleStudent(id: string) {
+    setOpenStudents((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
 
+  const recent = rows.slice(0, 12)
   const totalTracked = rows.length
   const totalMastered = rows.filter((r) => r.status === 'mastered').length
 
@@ -153,9 +156,7 @@ export default function ReportsPage() {
         }}
       >
         <div style={cardStyle}>
-          <h1 style={{ margin: 0, color: colors.navy }}>
-            Development Tracking
-          </h1>
+          <h1 style={{ margin: 0, color: colors.navy }}>Development Tracking</h1>
           <p style={{ color: '#64748b', marginTop: 8 }}>
             A school-wide view of every student&rsquo;s Montessori progress and
             recent activity.
@@ -169,15 +170,19 @@ export default function ReportsPage() {
 
         <div style={cardStyle}>
           <h2 style={{ marginTop: 0, color: colors.navy }}>Student Overview</h2>
+          <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 0 }}>
+            Tap a student to expand their detail.
+          </p>
           {students.length === 0 ? (
             <p style={{ margin: 0 }}>
-              No students yet. Add students on the Students page to begin
-              tracking development.
+              No students yet. Add students on the Students page (under Manage) to
+              begin tracking development.
             </p>
           ) : (
-            <div style={{ display: 'grid', gap: 12 }}>
+            <div style={{ display: 'grid', gap: 10 }}>
               {students.map((s) => {
                 const d = perStudent[s.id]
+                const isOpen = !!openStudents[s.id]
                 const workingAreas = MONTESSORI_AREAS.filter((a) =>
                   d.areas.has(a)
                 )
@@ -187,22 +192,40 @@ export default function ReportsPage() {
                     style={{
                       border: '1px solid #e2e8f0',
                       borderRadius: 12,
-                      padding: 16,
+                      overflow: 'hidden',
                     }}
                   >
-                    <div
+                    <button
+                      onClick={() => toggleStudent(s.id)}
                       style={{
+                        width: '100%',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         gap: 12,
+                        padding: 16,
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left',
                         flexWrap: 'wrap',
                       }}
                     >
-                      <strong style={{ color: colors.navy, fontSize: 16 }}>
+                      <strong
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          color: colors.navy,
+                          fontSize: 16,
+                        }}
+                      >
+                        <span style={{ fontSize: 12, color: '#94a3b8' }}>
+                          {isOpen ? '▼' : '▶'}
+                        </span>
                         {s.name || 'Unnamed Student'}
                       </strong>
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         <Pill
                           color={STATUS_COLORS.introduced}
                           label={`${d.introduced} Introduced`}
@@ -216,43 +239,61 @@ export default function ReportsPage() {
                           color={STATUS_COLORS.mastered}
                           label={`${d.mastered} Mastered`}
                         />
-                      </div>
-                    </div>
-
-                    <div style={{ marginTop: 10 }}>
-                      <span
-                        style={{
-                          fontSize: 13,
-                          color: '#64748b',
-                          marginRight: 8,
-                        }}
-                      >
-                        Working in:
                       </span>
-                      {workingAreas.length === 0 ? (
-                        <span style={{ fontSize: 13, color: '#94a3b8' }}>
-                          No areas started yet
+                    </button>
+
+                    {isOpen && (
+                      <div style={{ padding: '0 16px 16px' }}>
+                        <span
+                          style={{
+                            fontSize: 13,
+                            color: '#64748b',
+                            marginRight: 8,
+                          }}
+                        >
+                          Working in:
                         </span>
-                      ) : (
-                        <span style={{ display: 'inline-flex', gap: 6, flexWrap: 'wrap' }}>
-                          {workingAreas.map((a) => (
-                            <span
-                              key={a}
-                              style={{
-                                background: '#eef2ff',
-                                color: colors.navy,
-                                fontSize: 12,
-                                fontWeight: 600,
-                                padding: '3px 9px',
-                                borderRadius: 999,
-                              }}
-                            >
-                              {a}
-                            </span>
-                          ))}
-                        </span>
-                      )}
-                    </div>
+                        {workingAreas.length === 0 ? (
+                          <span style={{ fontSize: 13, color: '#94a3b8' }}>
+                            No areas started yet
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              gap: 6,
+                              flexWrap: 'wrap',
+                            }}
+                          >
+                            {workingAreas.map((a) => (
+                              <span
+                                key={a}
+                                style={{
+                                  background: '#eef2ff',
+                                  color: colors.navy,
+                                  fontSize: 12,
+                                  fontWeight: 600,
+                                  padding: '3px 9px',
+                                  borderRadius: 999,
+                                }}
+                              >
+                                {a}
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                        <p
+                          style={{
+                            margin: '10px 0 0',
+                            fontSize: 13,
+                            color: '#94a3b8',
+                          }}
+                        >
+                          {d.total} material{d.total === 1 ? '' : 's'} tracked in
+                          total.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -291,7 +332,9 @@ export default function ReportsPage() {
                       &middot; {r.area} &middot; {r.material}
                     </span>
                   </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span
+                    style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+                  >
                     <Pill
                       color={STATUS_COLORS[r.status]}
                       label={STATUS_LABELS[r.status]}
