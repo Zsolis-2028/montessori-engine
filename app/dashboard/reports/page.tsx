@@ -34,6 +34,7 @@ export default function ReportsPage() {
   const [students, setStudents] = useState<Student[]>([])
   const [rows, setRows] = useState<ProgressRow[]>([])
   const [openStudents, setOpenStudents] = useState<Record<string, boolean>>({})
+  const [recentOpen, setRecentOpen] = useState(true)
 
   useEffect(() => {
     async function loadData() {
@@ -302,7 +303,31 @@ export default function ReportsPage() {
         </div>
 
         <div style={cardStyle}>
-          <h2 style={{ marginTop: 0, color: colors.navy }}>Recent Activity</h2>
+          <button
+            onClick={() => setRecentOpen((o) => !o)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              textAlign: 'left',
+            }}
+          >
+            <span style={{ fontSize: 12, color: '#94a3b8' }}>
+              {recentOpen ? '▼' : '▶'}
+            </span>
+            <h2 style={{ margin: 0, color: colors.navy }}>Recent Activity</h2>
+            <span style={{ color: '#94a3b8', fontSize: 13, fontWeight: 400 }}>
+              ({recent.length})
+            </span>
+          </button>
+
+          {recentOpen && (
+          <div style={{ marginTop: 12 }}>
           <p style={{ color: '#94a3b8', fontSize: 13, marginTop: 0 }}>
             Latest progress updates. Saved observation notes will also appear
             here once per-student observation saving is enabled.
@@ -347,6 +372,8 @@ export default function ReportsPage() {
                 </div>
               ))}
             </div>
+          )}
+          </div>
           )}
         </div>
       </div>
