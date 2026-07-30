@@ -80,11 +80,13 @@ serve(async (req) => {
 
     await supabase.from("signup_rate_limits").insert({ ip_address: ip });
 
-    const { name, schoolName, email, password, captchaToken } = await req.json();
+    const { name, schoolName, email, password, captchaToken, planType } = await req.json();
 
     if (!name || !schoolName || !email || !password) {
       return json({ error: "Missing required fields." }, 400);
     }
+
+    const resolvedPlanType = planType === "individual" ? "individual" : "organization";
 
     const captchaOk = await verifyCaptcha(captchaToken, ip);
     if (!captchaOk) {
@@ -106,7 +108,7 @@ serve(async (req) => {
 
     const { data: school, error: schoolError } = await supabase
       .from("schools")
-      .insert({ name: schoolName })
+      .insert({ name: schoolName, plan_type: resolvedPlanType })
       .select("id")
       .single();
 

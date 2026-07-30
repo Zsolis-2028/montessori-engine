@@ -13,8 +13,11 @@ import { sanitizeInput } from '@/lib/sanitize'
 // once this env var and the matching secret in Supabase are set.
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
+type PlanType = 'organization' | 'individual'
+
 export default function SignupPage() {
   const router = useRouter()
+  const [planType, setPlanType] = useState<PlanType>('organization')
   const [name, setName] = useState('')
   const [schoolName, setSchoolName] = useState('')
   const [email, setEmail] = useState('')
@@ -49,6 +52,7 @@ export default function SignupPage() {
         email,
         password,
         captchaToken: captchaToken || undefined,
+        planType,
       },
     })
 
@@ -88,6 +92,56 @@ export default function SignupPage() {
           <p style={{ marginTop: 0, marginBottom: 20, color: colors.textMuted, fontSize: 14 }}>
             Start your 30-day free trial
           </p>
+
+          <div style={{ marginBottom: 20 }}>
+            <p style={{ margin: '0 0 8px', fontSize: 14, fontWeight: 600, color: colors.navy }}>
+              I am signing up as a...
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {(
+                [
+                  {
+                    value: 'organization' as const,
+                    title: 'School or Organization',
+                    subtitle: '$200/month',
+                  },
+                  {
+                    value: 'individual' as const,
+                    title: 'Individual / Personal use',
+                    subtitle: '$29/month',
+                  },
+                ]
+              ).map((option) => (
+                <label
+                  key={option.value}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: 10,
+                    border: `1px solid ${
+                      planType === option.value ? colors.gold : colors.border
+                    }`,
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    background: planType === option.value ? colors.bg : 'transparent',
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="planType"
+                    value={option.value}
+                    checked={planType === option.value}
+                    onChange={() => setPlanType(option.value)}
+                  />
+                  <span style={{ fontSize: 14 }}>
+                    <strong style={{ color: colors.navy }}>{option.title}</strong>{' '}
+                    <span style={{ color: colors.textMuted }}>({option.subtitle})</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <form
             onSubmit={handleSignup}
