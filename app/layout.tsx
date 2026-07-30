@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     "early childhood education",
   ],
   authors: [{ name: "Montessori Engine" }],
+  verification: {
+    google: "6hazwcgmYDHyM8nOhasCAKz-h-7vLBtN0-8nPOVCaHk",
+  },
   openGraph: {
     type: "website",
     url: "https://montessoriengine.com",
