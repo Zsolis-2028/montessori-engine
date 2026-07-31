@@ -22,19 +22,22 @@ export default function TermsPage() {
         <Section title="Free Trial">
           New accounts receive a <strong>30-day free trial</strong> with full access to Montessori
           Engine&rsquo;s core teaching tools — the activity generator, observation writer, daily
-          planner, and student records. Student progress tracking and development reports are included
-          with the School and District plans. No credit card is required to start your trial. At the
-          end of the trial period, your account will be paused unless you add a payment method and
-          subscribe. Your data is preserved during a paused account for 30 days.
+          planner, and student records. Additional features are available with upgraded plans. No
+          credit card is required to start your trial. At the end of the trial period, your account
+          will be paused unless you add a payment method and subscribe. Your data is preserved during
+          a paused account for 30 days.
         </Section>
 
         <Section title="Subscription and Pricing">
           <p>After the free trial, the Service is offered on the following plans:</p>
           <ul>
-            <li><strong>Individual plan.</strong> For a single individual educator, homeschool family, or caregiver. See &ldquo;Individual / Personal Plan&rdquo; below for additional terms.</li>
-            <li><strong>School plan.</strong> Covers a single school location with unlimited teachers and classrooms, including student progress tracking and development reports.</li>
-            <li><strong>District plan.</strong> For organizations operating multiple school locations under one administration, with district-wide reporting. Contact us for a quote.</li>
+            <li><strong>School plan — $200 per month per school.</strong> Covers a single school location with unlimited teachers and classrooms, including student progress tracking and development reports.</li>
+            <li><strong>District plan — custom pricing.</strong> For organizations operating multiple school locations under one administration, with district-wide reporting. Contact us for a quote.</li>
           </ul>
+          <p>
+            An Individual plan is also available for single users signing up on their own behalf.
+            See &ldquo;Individual / Personal Plan&rdquo; below for details.
+          </p>
           <p>
             Billing is charged monthly to the payment method on file. All prices are in USD. We reserve
             the right to change pricing with 60 days&rsquo; written notice to active subscribers.
@@ -76,11 +79,11 @@ export default function TermsPage() {
         </Section>
 
         <Section title="Data Ownership">
-          You own your data. All content you create in Montessori Engine — including activities,
-          observations, student records, and lesson plans — belongs to you and your school. We do
-          not claim any intellectual property rights over your content. You may export your data at
-          any time. Upon account deletion, your data is permanently removed from our systems within
-          30 days.
+          You own your data. All content you create in Montessori Engine — including activities and
+          observations — belongs to you and your school. Additional features are available with
+          upgraded plans. We do not claim any intellectual property rights over your content. You may
+          export your data at any time. Upon account deletion, your data is permanently removed from
+          our systems within 30 days.
         </Section>
 
         <Section title="Acceptable Use">
