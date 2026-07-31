@@ -104,13 +104,11 @@ export default function SignupPage() {
                     value: 'organization' as const,
                     title: 'School or Organization',
                     subtitle: 'Unlimited teachers & classrooms',
-                    price: '$200',
                   },
                   {
                     value: 'individual' as const,
                     title: 'Individual / Personal Use',
                     subtitle: 'Educators, homeschoolers & caregivers',
-                    price: '$29',
                   },
                 ]
               ).map((option) => {
@@ -166,19 +164,6 @@ export default function SignupPage() {
                         </span>
                       </span>
                     </div>
-                    <span
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: colors.navy,
-                        background: selected ? colors.gold : colors.bg,
-                        padding: '4px 10px',
-                        borderRadius: 999,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {option.price}/mo
-                    </span>
                   </label>
                 )
               })}
