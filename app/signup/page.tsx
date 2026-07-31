@@ -57,7 +57,34 @@ export default function SignupPage() {
     })
 
     if (fnError || !data?.success) {
-      setError(data?.error ?? fnError?.message ?? 'Signup failed. Please try again.')
+      let message = 'Signup failed. Please try again.'
+
+      // The function returns a JSON body like { error: "..." } even on errors.
+      // supabase-js hides that behind fnError.context (the raw Response), so we
+      // read it out to show the real reason instead of "non-2xx status code".
+      if (data?.error) {
+        message = data.error
+      } else if (fnError) {
+        const ctx = (fnError as unknown as { context?: Response }).context
+        if (ctx && typeof ctx.json === 'function') {
+          try {
+            const body = await ctx.json()
+            if (body?.error) message = body.error
+          } catch {
+            /* fall back to default message */
+          }
+        }
+      }
+
+      // Friendlier wording for the most common cases.
+      const lower = message.toLowerCase()
+      if (lower.includes('already') && lower.includes('regist')) {
+        message = 'That email is already registered. Try logging in instead.'
+      } else if (lower.includes('too many')) {
+        message = 'Too many signup attempts. Please wait a little and try again.'
+      }
+
+      setError(message)
       setLoading(false)
       if (captchaEnabled) resetCaptcha()
       return
