@@ -212,6 +212,19 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Not a school? */}
+      <section style={{ padding: '56px 24px', background: colors.bg, textAlign: 'center' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto' }}>
+          <h2 style={{ color: colors.navy, fontSize: 24, fontWeight: 800, marginBottom: 12 }}>
+            Not a school? Montessori Engine works for individual educators, homeschool
+            families, and caregivers too.
+          </h2>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="btn-outline-navy">
+            Contact Us
+          </a>
+        </div>
+      </section>
+
       {/* Security / trust */}
       <section style={{ padding: '72px 24px', maxWidth: 1000, margin: '0 auto' }}>
         <h2 style={{ color: colors.navy, textAlign: 'center', fontSize: 30, fontWeight: 800, marginBottom: 10 }}>
@@ -294,6 +307,18 @@ export default function HomePage() {
           border: 1px solid rgba(255,255,255,0.35);
         }
         .btn-outline:hover { background: rgba(255,255,255,0.08); }
+        .btn-outline-navy {
+          display: inline-block;
+          background: transparent;
+          color: var(--color-navy);
+          font-weight: 700;
+          font-size: 15px;
+          padding: 12px 26px;
+          border-radius: 8px;
+          text-decoration: none;
+          border: 1.5px solid var(--color-navy);
+        }
+        .btn-outline-navy:hover { background: var(--color-navy); color: #fff; }
         @media (max-width: 640px) {
           .hero-title { font-size: 32px; }
           .nav-link { display: none; }

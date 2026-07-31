@@ -31,6 +31,7 @@ export default function TermsPage() {
         <Section title="Subscription and Pricing">
           <p>After the free trial, the Service is offered on the following plans:</p>
           <ul>
+            <li><strong>Individual plan — $29 per month.</strong> For a single individual educator, homeschool family, or caregiver. See &ldquo;Individual / Personal Plan&rdquo; below for additional terms.</li>
             <li><strong>School plan — $200 per month per school.</strong> Covers a single school location with unlimited teachers and classrooms, including student progress tracking and development reports.</li>
             <li><strong>District plan — custom pricing.</strong> For organizations operating multiple school locations under one administration, with district-wide reporting. Contact us for a quote.</li>
           </ul>
@@ -38,6 +39,25 @@ export default function TermsPage() {
             Billing is charged monthly to the payment method on file. All prices are in USD. We reserve
             the right to change pricing with 60 days&rsquo; written notice to active subscribers.
           </p>
+        </Section>
+
+        <Section title="Individual / Personal Plan">
+          <p>
+            Montessori Engine also offers an <strong>Individual plan — $29 per month</strong>, intended
+            for individual educators, homeschool families, and caregivers using the Service on their own
+            behalf rather than as part of a school. All terms in this document apply equally to
+            Individual plan subscribers unless stated otherwise below.
+          </p>
+          <ul>
+            <li>The Individual plan is limited to <strong>one user per account</strong>. Accounts may not
+              be shared across multiple educators or caregivers.</li>
+            <li>The Individual plan is intended for personal, non-commercial use and is <strong>not
+              licensed for use by a school, center, or other organization operating as a commercial
+              Montessori program</strong>. Schools and organizations must subscribe to the School or
+              District plan.</li>
+            <li>If we determine an Individual plan account is being used for commercial school
+              operation, we may require you to upgrade to the School plan or suspend the account.</li>
+          </ul>
         </Section>
 
         <Section title="Payment">

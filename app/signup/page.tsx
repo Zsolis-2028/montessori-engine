@@ -93,53 +93,95 @@ export default function SignupPage() {
             Start your 30-day free trial
           </p>
 
-          <div style={{ marginBottom: 20 }}>
-            <p style={{ margin: '0 0 8px', fontSize: 14, fontWeight: 600, color: colors.navy }}>
+          <div style={{ marginBottom: 22 }}>
+            <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: colors.navy, textTransform: 'uppercase', letterSpacing: 0.4 }}>
               I am signing up as a...
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {(
                 [
                   {
                     value: 'organization' as const,
                     title: 'School or Organization',
-                    subtitle: '$200/month',
+                    subtitle: 'Unlimited teachers & classrooms',
+                    price: '$200',
                   },
                   {
                     value: 'individual' as const,
-                    title: 'Individual / Personal use',
-                    subtitle: '$29/month',
+                    title: 'Individual / Personal Use',
+                    subtitle: 'Educators, homeschoolers & caregivers',
+                    price: '$29',
                   },
                 ]
-              ).map((option) => (
-                <label
-                  key={option.value}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: 10,
-                    border: `1px solid ${
-                      planType === option.value ? colors.gold : colors.border
-                    }`,
-                    borderRadius: 8,
-                    cursor: 'pointer',
-                    background: planType === option.value ? colors.bg : 'transparent',
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="planType"
-                    value={option.value}
-                    checked={planType === option.value}
-                    onChange={() => setPlanType(option.value)}
-                  />
-                  <span style={{ fontSize: 14 }}>
-                    <strong style={{ color: colors.navy }}>{option.title}</strong>{' '}
-                    <span style={{ color: colors.textMuted }}>({option.subtitle})</span>
-                  </span>
-                </label>
-              ))}
+              ).map((option) => {
+                const selected = planType === option.value
+                return (
+                  <label
+                    key={option.value}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 12,
+                      padding: '14px 16px',
+                      border: `2px solid ${selected ? colors.gold : colors.border}`,
+                      borderRadius: 10,
+                      cursor: 'pointer',
+                      background: selected ? 'rgba(245,200,0,0.08)' : colors.card,
+                      transition: 'border-color 0.15s ease, background 0.15s ease',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          border: `2px solid ${selected ? colors.navy : colors.border}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {selected && (
+                          <span style={{ width: 10, height: 10, borderRadius: '50%', background: colors.navy }} />
+                        )}
+                      </span>
+                      <input
+                        type="radio"
+                        name="planType"
+                        value={option.value}
+                        checked={selected}
+                        onChange={() => setPlanType(option.value)}
+                        style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
+                      />
+                      <span>
+                        <span style={{ display: 'block', fontSize: 14.5, fontWeight: 700, color: colors.navy }}>
+                          {option.title}
+                        </span>
+                        <span style={{ display: 'block', fontSize: 12.5, color: colors.textMuted, marginTop: 1 }}>
+                          {option.subtitle}
+                        </span>
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: colors.navy,
+                        background: selected ? colors.gold : colors.bg,
+                        padding: '4px 10px',
+                        borderRadius: 999,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {option.price}/mo
+                    </span>
+                  </label>
+                )
+              })}
             </div>
           </div>
 
