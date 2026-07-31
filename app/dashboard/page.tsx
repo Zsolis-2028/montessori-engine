@@ -70,6 +70,20 @@ export default function DashboardPage() {
 
   const hasSchoolPlan = plan === 'school' || plan === 'district'
 
+  // ── Paid-feature gating (TEMPORARILY OFF) ────────────────────────────────
+  // Progress Tracking and Reports are open to EVERYONE for now, because there
+  // is no billing or trial-expiry system yet — locking features we can't charge
+  // for or enforce would only give early users less value.
+  //
+  // WHEN YOU LAND YOUR FIRST PAYING CUSTOMER, do all three of these together:
+  //   1. Flip GATE_PAID_FEATURES to true (re-locks the cards below by plan).
+  //   2. Add the same plan check to app/dashboard/progress/page.tsx and
+  //      app/dashboard/reports/page.tsx (redirect non-paid plans to /dashboard).
+  //   3. Hide the Progress/Reports links in components/TopBar.tsx for non-paid plans.
+  // (Also decide by then whether the $29 Individual plan includes these.)
+  const GATE_PAID_FEATURES = false
+  const lockPaid = GATE_PAID_FEATURES && !hasSchoolPlan
+
   type DashboardCard = {
     title: string
     description: string
@@ -96,23 +110,19 @@ export default function DashboardPage() {
     },
     {
       title: 'Progress Tracking',
-      description: hasSchoolPlan
-        ? 'Track each student across Practical Life, Sensorial, Math, Language, and Cultural.'
-        : 'Track student mastery across every Montessori area.',
+      description: 'Track each student across Practical Life, Sensorial, Math, Language, and Cultural.',
       path: '/dashboard/progress',
       icon: ProgressIcon,
       variant: 'default',
-      locked: !hasSchoolPlan,
+      locked: lockPaid,
     },
     {
       title: 'Reports',
-      description: hasSchoolPlan
-        ? 'School-wide development tracking and recent activity across all students.'
-        : 'School-wide development reports for all your students.',
+      description: 'A school-wide view of student progress and recent activity.',
       path: '/dashboard/reports',
       icon: ReportIcon,
       variant: 'default',
-      locked: !hasSchoolPlan,
+      locked: lockPaid,
     },
   ]
 
