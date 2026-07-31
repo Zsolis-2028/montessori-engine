@@ -200,10 +200,16 @@ export default function SignupPage() {
               style={{ padding: 10, border: `1px solid ${colors.border}`, borderRadius: 4 }}
             />
 
-            <label>School Name</label>
+            <label>
+              {planType === 'individual' ? 'Workspace name' : 'School name'}
+            </label>
             <input
               type="text"
-              placeholder="Sunrise Montessori"
+              placeholder={
+                planType === 'individual'
+                  ? 'e.g. Smith Family Homeschool'
+                  : 'Sunrise Montessori'
+              }
               value={schoolName}
               onChange={(e) => setSchoolName(e.target.value)}
               required
