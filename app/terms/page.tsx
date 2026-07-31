@@ -31,9 +31,9 @@ export default function TermsPage() {
         <Section title="Subscription and Pricing">
           <p>After the free trial, the Service is offered on the following plans:</p>
           <ul>
-            <li><strong>Individual plan — $29 per month.</strong> For a single individual educator, homeschool family, or caregiver. See &ldquo;Individual / Personal Plan&rdquo; below for additional terms.</li>
-            <li><strong>School plan — $200 per month per school.</strong> Covers a single school location with unlimited teachers and classrooms, including student progress tracking and development reports.</li>
-            <li><strong>District plan — custom pricing.</strong> For organizations operating multiple school locations under one administration, with district-wide reporting. Contact us for a quote.</li>
+            <li><strong>Individual plan.</strong> For a single individual educator, homeschool family, or caregiver. See &ldquo;Individual / Personal Plan&rdquo; below for additional terms.</li>
+            <li><strong>School plan.</strong> Covers a single school location with unlimited teachers and classrooms, including student progress tracking and development reports.</li>
+            <li><strong>District plan.</strong> For organizations operating multiple school locations under one administration, with district-wide reporting. Contact us for a quote.</li>
           </ul>
           <p>
             Billing is charged monthly to the payment method on file. All prices are in USD. We reserve
@@ -43,7 +43,7 @@ export default function TermsPage() {
 
         <Section title="Individual / Personal Plan">
           <p>
-            Montessori Engine also offers an <strong>Individual plan — $29 per month</strong>, intended
+            Montessori Engine also offers an <strong>Individual plan</strong>, intended
             for individual educators, homeschool families, and caregivers using the Service on their own
             behalf rather than as part of a school. All terms in this document apply equally to
             Individual plan subscribers unless stated otherwise below.
